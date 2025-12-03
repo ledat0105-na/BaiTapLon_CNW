@@ -1,0 +1,94 @@
+@model WebHoney.Models.HomePageSettings
+@{
+    ViewData["Title"] = "Cài đặt trang chủ";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-cog me-2"></i> Cài đặt trang chủ</h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh giới thiệu (bên trái phần giới thiệu)</label>
+                                    <div class="mb-2">
+                                        @if (!string.IsNullOrEmpty(Model.FeaturedImageUrl))
+                                        {
+                                            <img src="@Model.FeaturedImageUrl" alt="Ảnh hiện tại" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" onerror="this.src='/assets/images/featured.jpg'; this.onerror=null;">
+                                        }
+                                        else
+                                        {
+                                            <img src="/assets/images/featured.jpg" alt="Ảnh mặc định" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;">
+                                        }
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="imageFile" class="form-label">Upload ảnh mới:</label>
+                                        <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" onchange="previewImage(this)">
+                                        <small class="form-text text-muted">Chọn file ảnh để upload (JPG, PNG, GIF)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="imageUrl" class="form-label">Hoặc nhập URL ảnh:</label>
+                                        <input type="url" name="imageUrl" id="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" value="@Model.FeaturedImageUrl">
+                                        <small class="form-text text-muted">Nhập đường dẫn URL của ảnh (nếu không upload file)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h5><i class="fa fa-info-circle"></i> Hướng dẫn</h5>
+                                    <ul>
+                                        <li>Ảnh sẽ được hiển thị ở phần giới thiệu bên trái trang chủ</li>
+                                        <li>Kích thước khuyến nghị: 600x400px hoặc tỷ lệ tương tự</li>
+                                        <li>Bạn có thể upload file hoặc nhập URL ảnh</li>
+                                        <li>Nếu upload file, ảnh sẽ được lưu trong thư mục uploads/homepage</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Lưu thay đổi
+                            </button>
+                            <a href="@Url.Action("Index", "Admin")" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = input.closest('.mb-3').querySelector('img');
+            if (img) {
+                img.src = e.target.result;
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+

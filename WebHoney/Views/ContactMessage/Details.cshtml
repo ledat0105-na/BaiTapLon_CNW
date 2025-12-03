@@ -1,0 +1,155 @@
+@model WebHoney.Models.ContactMessage
+@{
+    ViewData["Title"] = "Chi tiết tin nhắn";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-envelope me-2"></i> Chi tiết tin nhắn #@Model.Id</h3>
+                    <div class="card-tools">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary">
+                            <i class="fa fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 150px;">ID:</th>
+                                    <td>@Model.Id</td>
+                                </tr>
+                                <tr>
+                                    <th>Người gửi:</th>
+                                    <td>
+                                        <strong>@Model.Name</strong>
+                                        @if (Model.User != null)
+                                        {
+                                            <br><small class="text-muted">(Tài khoản: @Model.User.Username)</small>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>@(Model.Email ?? "N/A")</td>
+                                </tr>
+                                <tr>
+                                    <th>Điện thoại:</th>
+                                    <td>@(Model.Phone ?? "N/A")</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiêu đề:</th>
+                                    <td>@(Model.Subject ?? "Không có tiêu đề")</td>
+                                </tr>
+                                <tr>
+                                    <th>Trạng thái:</th>
+                                    <td>
+                                        @if (Model.Status == "NEW")
+                                        {
+                                            <span class="badge bg-danger">Mới</span>
+                                        }
+                                        else if (Model.Status == "IN_PROGRESS")
+                                        {
+                                            <span class="badge bg-warning">Đang xử lý</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Đã xử lý</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Thời gian gửi:</th>
+                                    <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                </tr>
+                                @if (Model.UpdatedAt.HasValue)
+                                {
+                                    <tr>
+                                        <th>Cập nhật lúc:</th>
+                                        <td>@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Nội dung tin nhắn</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p style="white-space: pre-wrap; line-height: 1.8;">@Model.Message</p>
+                                </div>
+                            </div>
+
+                            <!-- Update Status Form -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h5>Cập nhật trạng thái</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="@Url.Action("UpdateStatus", new { id = Model.Id })">
+                                        @Html.AntiForgeryToken()
+                                        <div class="mb-3">
+                                            <select name="status" class="form-select">
+                                                @if (Model.Status == "NEW")
+                                                {
+                                                    <option value="NEW" selected>Mới</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="NEW">Mới</option>
+                                                }
+                                                @if (Model.Status == "IN_PROGRESS")
+                                                {
+                                                    <option value="IN_PROGRESS" selected>Đang xử lý</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="IN_PROGRESS">Đang xử lý</option>
+                                                }
+                                                @if (Model.Status == "RESOLVED")
+                                                {
+                                                    <option value="RESOLVED" selected>Đã xử lý</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="RESOLVED">Đã xử lý</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-save"></i> Cập nhật
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Delete Form -->
+                            <div class="mt-3">
+                                <form method="post" action="@Url.Action("Delete", new { id = Model.Id })" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i> Xóa tin nhắn
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

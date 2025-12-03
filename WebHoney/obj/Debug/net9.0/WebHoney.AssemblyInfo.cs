@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e9a9f0af7104ded305cf15c2ce74cfa90404746e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32815b665132006898382c07b81bb189f1036e3c")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

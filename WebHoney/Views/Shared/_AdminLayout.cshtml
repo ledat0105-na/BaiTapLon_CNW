@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/assets/css/fontawesome.css" />
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h4 {
+            color: white;
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .top-navbar {
+            background-color: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+        
+        .page-header {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fa fa-tachometer-alt"></i> Admin Panel</h4>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a asp-controller="Admin" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Banner" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Banner" ? "active" : "")">
+                    <i class="fa fa-image"></i> Quản lý banner
+                </a>
+            </li>
+            <li>
+                <a asp-controller="FeaturedProduct" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "FeaturedProduct" ? "active" : "")">
+                    <i class="fa fa-star"></i> Sản phẩm nổi bật
+                </a>
+            </li>
+            <li>
+                <a asp-controller="HomePageSettings" asp-action="Edit" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "HomePageSettings" ? "active" : "")">
+                    <i class="fa fa-cog"></i> Cài đặt trang chủ
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ContactMessage" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "ContactMessage" ? "active" : "")">
+                    <i class="fa fa-envelope"></i> Tin nhắn liên hệ
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Product" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")">
+                    <i class="fa fa-box"></i> Quản lý sản phẩm
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Category" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "")">
+                    <i class="fa fa-folder"></i> Quản lý danh mục
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Order" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Order" ? "active" : "")">
+                    <i class="fa fa-shopping-cart"></i> Quản lý đơn hàng
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Customer" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Customer" ? "active" : "")">
+                    <i class="fa fa-users"></i> Quản lý khách hàng
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Admin" asp-action="Reports" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Reports" ? "active" : "")">
+                    <i class="fa fa-chart-line"></i> Báo cáo thống kê
+                </a>
+            </li>
+            <li style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px;">
+                <a asp-controller="Account" asp-action="Logout">
+                    <i class="fa fa-sign-out"></i> Đăng xuất
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+                <div>
+                    <span><i class="fa fa-user"></i> @Context.Session.GetString("FullName") (@Context.Session.GetString("Email"))</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Content -->
+        <div>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            @RenderBody()
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

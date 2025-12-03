@@ -1,0 +1,155 @@
+@model WebHoney.Models.BannerImage
+@{
+    ViewData["Title"] = "Chỉnh sửa banner";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Chỉnh sửa banner</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ImageUrl" />
+                <input type="hidden" asp-for="CreatedAt" />
+                
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Hình ảnh banner</label>
+                    <div class="card">
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh hiện tại:</label>
+                                    <div>
+                                        <img src="@Model.ImageUrl" alt="@Model.Title" id="currentImage" class="img-thumbnail" style="max-width: 100%; height: 300px; object-fit: cover; border: 2px solid #dee2e6;" />
+                                    </div>
+                                    <small class="text-muted">
+                                        <a href="@Model.ImageUrl" target="_blank" class="text-decoration-none">
+                                            <i class="fa fa-external-link"></i> Mở ảnh trong tab mới
+                                        </a>
+                                    </small>
+                                </div>
+                            }
+                            
+                            <div class="mb-3">
+                                <label for="imageFile" class="form-label">Upload ảnh mới (để trống nếu giữ ảnh cũ)</label>
+                                <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" />
+                                <small class="form-text text-muted">Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp). Kích thước tối đa: 5MB</small>
+                                <div id="imagePreview" class="mt-2" style="display: none;">
+                                    <label class="form-label">Ảnh xem trước:</label>
+                                    <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 100%; height: 300px; object-fit: cover; border: 2px solid #28a745;" />
+                                </div>
+                            </div>
+                            <div class="text-center my-2">
+                                <strong class="text-muted">HOẶC</strong>
+                            </div>
+                            <div class="mb-3">
+                                <label for="imageUrlInput" class="form-label">Nhập URL hình ảnh</label>
+                                <input type="text" id="imageUrlInput" class="form-control" placeholder="https://example.com/image.jpg hoặc /images/banner.jpg" />
+                                <small class="form-text text-muted">Nhập đường dẫn URL của hình ảnh. Nếu nhập URL, ảnh upload sẽ bị bỏ qua.</small>
+                                <button type="button" id="previewUrlBtn" class="btn btn-sm btn-info mt-2">
+                                    <i class="fa fa-eye"></i> Xem trước URL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Tiêu đề</label>
+                    <input asp-for="Title" class="form-control" placeholder="Ví dụ: Mật ong thiên nhiên tốt nhất" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Subtitle" class="form-label">Phụ đề</label>
+                    <input asp-for="Subtitle" class="form-control" placeholder="Ví dụ: Chất lượng cao, nguyên chất 100%" />
+                    <span asp-validation-for="Subtitle" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DisplayOrder" class="form-label">Thứ tự hiển thị</label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" min="0" />
+                    <small class="form-text text-muted">Số càng nhỏ càng hiển thị trước.</small>
+                    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Hiển thị banner</label>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Lưu thay đổi
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fa fa-times"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Preview ảnh mới khi chọn file
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('previewImg');
+                    const previewDiv = document.getElementById('imagePreview');
+                    if (preview && previewDiv) {
+                        preview.src = e.target.result;
+                        previewDiv.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+
+        // Preview ảnh từ URL
+        document.getElementById('previewUrlBtn').addEventListener('click', function() {
+            const url = document.getElementById('imageUrlInput').value.trim();
+            if (url) {
+                const preview = document.getElementById('previewImg');
+                const previewDiv = document.getElementById('imagePreview');
+                if (preview && previewDiv) {
+                    preview.src = url;
+                    previewDiv.style.display = 'block';
+                    preview.onerror = function() {
+                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
+                    };
+                }
+            } else {
+                alert('Vui lòng nhập URL hình ảnh.');
+            }
+        });
+
+        // Khi form submit, nếu có URL thì thêm vào form
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const urlInput = document.getElementById('imageUrlInput');
+            const url = urlInput ? urlInput.value.trim() : '';
+            if (url) {
+                // Tạo input hidden để gửi URL
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'imageUrl';
+                hiddenInput.value = url;
+                this.appendChild(hiddenInput);
+            }
+        });
+    </script>
+}
+

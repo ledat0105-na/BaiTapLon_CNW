@@ -1,0 +1,97 @@
+@model WebHoney.Models.Customer
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-action="Index">Khách hàng</a> / Chi tiết</span>
+                <h3>Chi tiết khách hàng #@Model.CustomerId</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contact-page section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Thông tin khách hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Mã khách hàng:</dt>
+                            <dd class="col-sm-8">@Model.CustomerId</dd>
+
+                            <dt class="col-sm-4">Họ tên:</dt>
+                            <dd class="col-sm-8">@Model.FullName</dd>
+
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">@Model.Email</dd>
+
+                            <dt class="col-sm-4">Số điện thoại:</dt>
+                            <dd class="col-sm-8">@(Model.Phone ?? "-")</dd>
+
+                            <dt class="col-sm-4">Địa chỉ:</dt>
+                            <dd class="col-sm-8">@(Model.Address ?? "-")</dd>
+
+                            <dt class="col-sm-4">Ngày tạo:</dt>
+                            <dd class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                        </dl>
+
+                        <hr />
+
+                        <h6>Đơn hàng của khách hàng (@Model.Orders.Count)</h6>
+                        @if (Model.Orders.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var order in Model.Orders.OrderByDescending(o => o.OrderDate))
+                                        {
+                                            <tr>
+                                                <td>#@order.OrderId</td>
+                                                <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                                <td>@order.TotalAmount.ToString("#,##0") VNĐ</td>
+                                                <td>
+                                                    <span class="badge bg-@(order.Status == "Delivered" ? "success" : order.Status == "Cancelled" ? "danger" : "warning")">
+                                                        @order.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Khách hàng chưa có đơn hàng nào.</p>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

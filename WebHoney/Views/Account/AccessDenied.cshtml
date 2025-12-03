@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a> / Truy cập bị từ chối</span>
+                <h3>Truy cập bị từ chối</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contact-page section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3 text-center">
+                <div class="section-heading">
+                    <h6>| Lỗi</h6>
+                    <h2>Bạn không có quyền truy cập trang này</h2>
+                </div>
+                <p>Bạn không có quyền để truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.</p>
+                <div class="mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="orange-button">Về trang chủ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
