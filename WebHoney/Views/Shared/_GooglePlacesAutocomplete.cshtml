@@ -1,0 +1,107 @@
+@*
+    Partial view để tích hợp Google Places Autocomplete cho địa chỉ
+    Sử dụng: @await Html.PartialAsync("_GooglePlacesAutocomplete", "Address")
+    Tham số: tên của input field cần autocomplete
+*@
+
+@model string
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    var inputId = Model ?? "Address";
+    var apiKey = ViewData["GoogleMapsApiKey"]?.ToString() ?? 
+                 Configuration["GoogleMapsApiKey"] ?? 
+                 "YOUR_GOOGLE_MAPS_API_KEY_HERE";
+}
+
+<script src="https://maps.googleapis.com/maps/api/js?key=@apiKey&libraries=places&language=vi&region=VN"></script>
+<script>
+    function initGooglePlacesAutocomplete(inputId) {
+        var input = document.getElementById(inputId);
+        if (input && typeof google !== 'undefined' && google.maps && google.maps.places) {
+            var autocomplete = new google.maps.places.Autocomplete(input, {
+                componentRestrictions: { country: ['vn'] }, // Chỉ tìm kiếm tại Việt Nam
+                fields: ['formatted_address', 'geometry', 'address_components'],
+                types: ['address']
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    console.warn("No details available for input: '" + place.name + "'");
+                    return;
+                }
+
+                // Lấy địa chỉ đầy đủ
+                var fullAddress = place.formatted_address || input.value;
+                input.value = fullAddress;
+
+                // Có thể lấy thêm thông tin chi tiết như tỉnh, quận/huyện, phường/xã
+                var addressComponents = place.address_components || [];
+                var addressData = {
+                    street: '',
+                    ward: '',
+                    district: '',
+                    city: '',
+                    country: ''
+                };
+
+                addressComponents.forEach(function(component) {
+                    var types = component.types;
+                    if (types.includes('street_number')) {
+                        addressData.street = component.long_name + ' ' + addressData.street;
+                    }
+                    if (types.includes('route')) {
+                        addressData.street += component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_3') || types.includes('sublocality')) {
+                        addressData.ward = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_2')) {
+                        addressData.district = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        addressData.city = component.long_name;
+                    }
+                    if (types.includes('country')) {
+                        addressData.country = component.long_name;
+                    }
+                });
+
+                // Có thể lưu vào các hidden field hoặc hiển thị thêm thông tin
+                // Ví dụ: lưu vào data attributes
+                input.setAttribute('data-ward', addressData.ward);
+                input.setAttribute('data-district', addressData.district);
+                input.setAttribute('data-city', addressData.city);
+            });
+
+            // Ngăn chặn submit form khi nhấn Enter trong autocomplete
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    var event = new KeyboardEvent('keydown', {
+                        key: 'Enter',
+                        code: 'Enter',
+                        keyCode: 13,
+                        which: 13,
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    input.dispatchEvent(event);
+                }
+            });
+        }
+    }
+
+    // Khởi tạo khi DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initGooglePlacesAutocomplete('@inputId');
+        });
+    } else {
+        initGooglePlacesAutocomplete('@inputId');
+    }
+</script>
+

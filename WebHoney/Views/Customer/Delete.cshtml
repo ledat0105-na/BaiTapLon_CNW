@@ -1,0 +1,70 @@
+@model WebHoney.Models.Customer
+@{
+    ViewData["Title"] = "Xóa khách hàng";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-action="Index">Khách hàng</a> / Xóa</span>
+                <h3>Xóa khách hàng</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contact-page section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                    <p>Bạn có chắc chắn muốn xóa khách hàng này? Hành động này không thể hoàn tác.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Thông tin khách hàng sẽ bị xóa</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Mã khách hàng:</dt>
+                            <dd class="col-sm-8">@Model.CustomerId</dd>
+
+                            <dt class="col-sm-4">Họ tên:</dt>
+                            <dd class="col-sm-8">@Model.FullName</dd>
+
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">@Model.Email</dd>
+
+                            <dt class="col-sm-4">Số điện thoại:</dt>
+                            <dd class="col-sm-8">@(Model.Phone ?? "-")</dd>
+
+                            <dt class="col-sm-4">Số đơn hàng:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-info">@Model.Orders.Count đơn hàng</span>
+                                @if (Model.Orders.Any())
+                                {
+                                    <small class="text-danger d-block mt-1">Khách hàng có đơn hàng, xóa có thể ảnh hưởng đến dữ liệu!</small>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" asp-for="CustomerId" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Xác nhận xóa
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

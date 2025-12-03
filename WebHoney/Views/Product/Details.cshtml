@@ -1,0 +1,130 @@
+@model WebHoney.Models.Product
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Chi tiết sản phẩm</h5>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                    <i class="fa fa-edit"></i> Chỉnh sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary btn-sm">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 400px;">
+                            <span class="text-muted">Chưa có hình ảnh</span>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">Mã sản phẩm:</dt>
+                        <dd class="col-sm-8"><strong>@Model.ProductId</strong></dd>
+
+                        <dt class="col-sm-4">Tên sản phẩm:</dt>
+                        <dd class="col-sm-8"><strong>@Model.Name</strong></dd>
+
+                        <dt class="col-sm-4">Danh mục:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Category != null)
+                            {
+                                <span class="badge bg-primary">@Model.Category.Name</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Slug:</dt>
+                        <dd class="col-sm-8"><code>@Model.Slug</code></dd>
+
+                        <dt class="col-sm-4">Giá bán:</dt>
+                        <dd class="col-sm-8">
+                            <strong class="text-danger fs-5">@Model.Price.ToString("#,##0") VNĐ</strong>
+                        </dd>
+
+                        <dt class="col-sm-4">Tồn kho:</dt>
+                        <dd class="col-sm-8">
+                            <strong class="@(Model.Stock <= 10 ? "text-danger" : "text-success")">@Model.Stock</strong>
+                            @if (Model.Stock <= 10)
+                            {
+                                <span class="badge bg-warning">Sắp hết hàng</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Xuất xứ:</dt>
+                        <dd class="col-sm-8">@(Model.Origin ?? "-")</dd>
+
+                        <dt class="col-sm-4">Dung tích:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Volume.HasValue)
+                            {
+                                <text>@Model.Volume.Value.ToString("N2") @(Model.Unit ?? "")</text>
+                            }
+                            else
+                            {
+                                <text>-</text>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Trạng thái:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Đang bán</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Ngừng bán</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Ngày tạo:</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <dt class="col-sm-4">Ngày cập nhật:</dt>
+                            <dd class="col-sm-8">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <hr>
+                <div class="mb-3">
+                    <h6>Mô tả sản phẩm:</h6>
+                    <div class="p-3 bg-light rounded">
+                        @Html.Raw(Model.Description.Replace("\n", "<br/>"))
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ShortDesc))
+            {
+                <div class="mb-3">
+                    <h6>Mô tả ngắn:</h6>
+                    <p class="text-muted">@Model.ShortDesc</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

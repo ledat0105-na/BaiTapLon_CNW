@@ -1,0 +1,146 @@
+@model IEnumerable<WebHoney.Models.ContactMessage>
+@{
+    ViewData["Title"] = "Quản lý tin nhắn liên hệ";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-envelope me-2"></i> Quản lý tin nhắn liên hệ</h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Filter by status -->
+                    <div class="mb-3">
+                        <form method="get" class="d-inline-flex gap-2">
+                            <select name="status" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                @{
+                                    var currentStatus = ViewData["CurrentStatus"]?.ToString() ?? "ALL";
+                                }
+                                @if (currentStatus == "ALL")
+                                {
+                                    <option value="ALL" selected>Tất cả</option>
+                                }
+                                else
+                                {
+                                    <option value="ALL">Tất cả</option>
+                                }
+                                @if (currentStatus == "NEW")
+                                {
+                                    <option value="NEW" selected>Mới</option>
+                                }
+                                else
+                                {
+                                    <option value="NEW">Mới</option>
+                                }
+                                @if (currentStatus == "IN_PROGRESS")
+                                {
+                                    <option value="IN_PROGRESS" selected>Đang xử lý</option>
+                                }
+                                else
+                                {
+                                    <option value="IN_PROGRESS">Đang xử lý</option>
+                                }
+                                @if (currentStatus == "RESOLVED")
+                                {
+                                    <option value="RESOLVED" selected>Đã xử lý</option>
+                                }
+                                else
+                                {
+                                    <option value="RESOLVED">Đã xử lý</option>
+                                }
+                            </select>
+                        </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Người gửi</th>
+                                    <th>Email</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thời gian</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Id</td>
+                                            <td>
+                                                <strong>@item.Name</strong>
+                                                @if (item.User != null)
+                                                {
+                                                    <br><small class="text-muted">(Đã đăng nhập: @item.User.Username)</small>
+                                                }
+                                            </td>
+                                            <td>@(item.Email ?? "N/A")</td>
+                                            <td>@(item.Subject ?? "Không có tiêu đề")</td>
+                                            <td>
+                                                @if (item.Status == "NEW")
+                                                {
+                                                    <span class="badge bg-danger">Mới</span>
+                                                }
+                                                else if (item.Status == "IN_PROGRESS")
+                                                {
+                                                    <span class="badge bg-warning">Đang xử lý</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Đã xử lý</span>
+                                                }
+                                            </td>
+                                            <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-eye"></i> Xem
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center">Không có tin nhắn nào.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if ((int)(ViewData["TotalPages"] ?? 0) > 1)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @for (int i = 1; i <= (int)(ViewData["TotalPages"] ?? 1); i++)
+                                {
+                                    <li class="page-item @(i == (int)(ViewData["CurrentPage"] ?? 1) ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = i, status = ViewData["CurrentStatus"] })">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

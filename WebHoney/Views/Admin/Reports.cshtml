@@ -1,0 +1,188 @@
+@{
+    ViewData["Title"] = "Báo cáo thống kê";
+    var period = ViewData["Period"]?.ToString() ?? "month";
+    var sortBy = ViewData["SortBy"]?.ToString() ?? "revenue";
+    var periodLabel = ViewData["PeriodLabel"]?.ToString() ?? "Tháng này";
+    var dailyReports = (List<WebHoney.Models.ViewModels.DailyReport>)ViewData["DailyReports"]!;
+    var totalOrders = (int)ViewData["TotalOrders"]!;
+    var totalRevenue = (decimal)ViewData["TotalRevenue"]!;
+    var avgOrderValue = (decimal)ViewData["AvgOrderValue"]!;
+}
+
+<div class="container-fluid">
+    <!-- Bộ lọc và tùy chọn -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Bộ lọc báo cáo</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="@Url.Action("Reports", "Admin")" class="row g-3">
+                <div class="col-md-4">
+                    <label for="period" class="form-label">Khoảng thời gian:</label>
+                    <select name="period" id="period" class="form-select" onchange="this.form.submit()">
+                        @if (period == "day")
+                        {
+                            <option value="day" selected>Hôm nay</option>
+                        }
+                        else
+                        {
+                            <option value="day">Hôm nay</option>
+                        }
+                        @if (period == "week")
+                        {
+                            <option value="week" selected>Tuần này</option>
+                        }
+                        else
+                        {
+                            <option value="week">Tuần này</option>
+                        }
+                        @if (period == "month")
+                        {
+                            <option value="month" selected>Tháng này</option>
+                        }
+                        else
+                        {
+                            <option value="month">Tháng này</option>
+                        }
+                        @if (period == "year")
+                        {
+                            <option value="year" selected>Năm nay</option>
+                        }
+                        else
+                        {
+                            <option value="year">Năm nay</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="sortBy" class="form-label">Sắp xếp theo:</label>
+                    <select name="sortBy" id="sortBy" class="form-select" onchange="this.form.submit()">
+                        @if (sortBy == "revenue")
+                        {
+                            <option value="revenue" selected>Doanh thu (giảm dần)</option>
+                        }
+                        else
+                        {
+                            <option value="revenue">Doanh thu (giảm dần)</option>
+                        }
+                        @if (sortBy == "orders")
+                        {
+                            <option value="orders" selected>Số đơn hàng (giảm dần)</option>
+                        }
+                        else
+                        {
+                            <option value="orders">Số đơn hàng (giảm dần)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Áp dụng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Tổng đơn hàng (@periodLabel)</div>
+                <div class="card-body">
+                    <h2 class="card-title">@totalOrders</h2>
+                    <p class="card-text">đơn hàng</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Tổng doanh thu (@periodLabel)</div>
+                <div class="card-body">
+                    <h2 class="card-title">@totalRevenue.ToString("N0")</h2>
+                    <p class="card-text">VNĐ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Giá trị đơn hàng trung bình</div>
+                <div class="card-body">
+                    <h2 class="card-title">@avgOrderValue.ToString("N0")</h2>
+                    <p class="card-text">VNĐ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng báo cáo chi tiết -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Chi tiết báo cáo (@periodLabel)</h5>
+        </div>
+        <div class="card-body">
+            @if (dailyReports.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @if (period == "day")
+                                    {
+                                        <text>Giờ</text>
+                                    }
+                                    else if (period == "year")
+                                    {
+                                        <text>Tháng</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Ngày</text>
+                                    }
+                                </th>
+                                <th>Số đơn hàng</th>
+                                <th>Doanh thu (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in dailyReports)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (period == "day")
+                                        {
+                                            <text>@report.Date.ToString("HH:00")</text>
+                                        }
+                                        else if (period == "year")
+                                        {
+                                            <text>@report.Date.ToString("MM/yyyy")</text>
+                                        }
+                                        else
+                                        {
+                                            <text>@report.Date.ToString("dd/MM/yyyy")</text>
+                                        }
+                                    </td>
+                                    <td>@report.OrderCount</td>
+                                    <td>@report.Revenue.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <th>Tổng cộng</th>
+                                <th>@totalOrders</th>
+                                <th>@totalRevenue.ToString("N0")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> Không có dữ liệu báo cáo trong khoảng thời gian này.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

@@ -1,8 +1,747 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang Chủ - Web bán mật ong";
+    var banners = (List<WebHoney.Models.BannerImage>)ViewData["Banners"] ?? new List<WebHoney.Models.BannerImage>();
+    var featuredProducts = (List<WebHoney.Models.FeaturedProduct>)ViewData["FeaturedProducts"] ?? new List<WebHoney.Models.FeaturedProduct>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="main-banner">
+    <div class="owl-carousel owl-banner">
+      @if (banners.Any())
+      {
+          @foreach (var banner in banners)
+          {
+              var timestamp = banner.UpdatedAt?.ToString("yyyyMMddHHmmss") ?? banner.CreatedAt.ToString("yyyyMMddHHmmss");
+              var imageUrlWithCache = $"{banner.ImageUrl}?v={timestamp}";
+              <div class="item" style="background-image: url('@imageUrlWithCache');">
+                  <div class="header-text">
+                      @if (!string.IsNullOrEmpty(banner.Title))
+                      {
+                          <span class="category">@banner.Title</span>
+                      }
+                      @if (!string.IsNullOrEmpty(banner.Subtitle))
+                      {
+                          <h2>@banner.Subtitle</h2>
+                      }
+                  </div>
+              </div>
+          }
+      }
+      else
+      {
+          <!-- Fallback banners nếu không có banner trong database -->
+          <div class="item item-1">
+            <div class="header-text">
+              <span class="category">Chất lượng cao!</span>
+              <h2>Mật ong thiên nhiên tốt nhất cho bạn</h2>
+            </div>
+          </div>
+          <div class="item item-2">
+            <div class="header-text">
+              <span class="category">Nhanh tay!</span>
+              <h2>Mật ong nguyên chất tốt nhất</h2>
+            </div>
+          </div>
+          <div class="item item-3">
+            <div class="header-text">
+              <span class="category">Đặt ngay!</span>
+              <h2>Mật ong hảo hạng chất lượng cao</h2>
+            </div>
+          </div>
+      }
+    </div>
+  </div>
+
+  <div class="featured section" style="background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); padding: 80px 0;">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-4">
+          <div class="left-image" style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <img src="@(ViewData["FeaturedImageUrl"] ?? "/assets/images/featured.jpg")" alt="Mật ong thiên nhiên" style="width: 100%; height: auto; border-radius: 15px; min-height: 300px; object-fit: cover;" onerror="this.src='/assets/images/featured.jpg'; this.onerror=null;">
+            <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,193,7,0.9); padding: 15px; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+              <i class="fa fa-heart" style="font-size: 24px; color: #fff;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="section-heading">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px;">| Nổi bật</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; margin-bottom: 30px;">Mật Ong Thiên Nhiên &amp; Nguyên Chất</h2>
+          </div>
+          <div class="accordion" id="accordionExample">
+            <div class="accordion-item" style="border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="background: #fff8e1; color: #2c3e50; font-weight: 600;">
+                  <i class="fa fa-question-circle me-2" style="color: #ff6b35;"></i> Mật ong có lợi ích gì?
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body" style="background: #fff; color: #555; line-height: 1.8;">
+                  Mật ong <strong style="color: #ff6b35;">thiên nhiên nguyên chất</strong> là món quà quý giá từ thiên nhiên, mang lại nhiều lợi ích cho sức khỏe như tăng cường hệ miễn dịch, làm đẹp da, hỗ trợ tiêu hóa và cung cấp năng lượng tự nhiên. Chúng tôi cung cấp mật ong chất lượng cao, được thu hoạch từ các vườn hoa tự nhiên, đảm bảo 100% nguyên chất không pha trộn.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item" style="border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="background: #fff8e1; color: #2c3e50; font-weight: 600;">
+                  <i class="fa fa-cog me-2" style="color: #ff6b35;"></i> Mật ong được sản xuất như thế nào?
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                <div class="accordion-body" style="background: #fff; color: #555; line-height: 1.8;">
+                  Mật ong của chúng tôi được sản xuất theo quy trình tự nhiên, ong mật thu thập mật hoa từ các loài hoa rừng và hoa cây trồng. Sau đó, ong chế biến mật hoa thành mật ong trong tổ ong. Chúng tôi thu hoạch mật ong một cách cẩn thận, đảm bảo giữ nguyên độ tinh khiết và các dưỡng chất tự nhiên, không qua xử lý nhiệt độ cao hay pha trộn.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item" style="border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="background: #fff8e1; color: #2c3e50; font-weight: 600;">
+                  <i class="fa fa-star me-2" style="color: #ff6b35;"></i> Tại sao chọn mật ong của chúng tôi?
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                <div class="accordion-body" style="background: #fff; color: #555; line-height: 1.8;">
+                  Chúng tôi cam kết cung cấp mật ong <strong style="color: #ff6b35;">100% nguyên chất</strong>, không pha đường, không chất bảo quản. Mật ong được thu hoạch từ các vùng nguyên liệu sạch, đảm bảo an toàn vệ sinh thực phẩm. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào mang đến sản phẩm chất lượng cao, giá cả hợp lý và dịch vụ tận tâm.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <div class="info-table" style="background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 25px; text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                <div style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 5px 15px rgba(255,107,53,0.3);">
+                  <i class="fa fa-certificate" style="font-size: 28px; color: #fff;"></i>
+                </div>
+                <h4 style="color: #2c3e50; font-weight: 700; margin: 0; font-size: 18px;">100%<br><span style="color: #7f8c8d; font-size: 14px; font-weight: 400;">Nguyên Chất</span></h4>
+              </li>
+              <li style="margin-bottom: 25px; text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 5px 15px rgba(76,175,80,0.3);">
+                  <i class="fa fa-leaf" style="font-size: 28px; color: #fff;"></i>
+                </div>
+                <h4 style="color: #2c3e50; font-weight: 700; margin: 0; font-size: 18px;">Thiên Nhiên<br><span style="color: #7f8c8d; font-size: 14px; font-weight: 400;">Không Hóa Chất</span></h4>
+              </li>
+              <li style="margin-bottom: 25px; text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                <div style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 5px 15px rgba(33,150,243,0.3);">
+                  <i class="fa fa-truck" style="font-size: 28px; color: #fff;"></i>
+                </div>
+                <h4 style="color: #2c3e50; font-weight: 700; margin: 0; font-size: 18px;">Giao Hàng<br><span style="color: #7f8c8d; font-size: 14px; font-weight: 400;">Nhanh Chóng</span></h4>
+              </li>
+              <li style="text-align: center;">
+                <div style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 5px 15px rgba(156,39,176,0.3);">
+                  <i class="fa fa-shield-alt" style="font-size: 28px; color: #fff;"></i>
+                </div>
+                <h4 style="color: #2c3e50; font-weight: 700; margin: 0; font-size: 18px;">Đảm Bảo<br><span style="color: #7f8c8d; font-size: 14px; font-weight: 400;">Chất Lượng</span></h4>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="video section" style="padding: 60px 0; background: #fff;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading text-center">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Video Giới Thiệu</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 32px;">Khám Phá Quy Trình Sản Xuất Mật Ong</h2>
+            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Xem video để hiểu rõ hơn về quy trình thu hoạch và chế biến mật ong thiên nhiên nguyên chất của chúng tôi</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="video-content" style="padding-bottom: 60px; background: #fff;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+          <div class="video-frame" style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <img src="~/assets/images/video-frame.jpg" alt="Video giới thiệu" style="width: 100%; height: auto; display: block;">
+            <a href="https://youtube.com" target="_blank" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,107,53,0.9); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; text-decoration: none; transition: all 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.3);" 
+               onmouseover="this.style.background='rgba(255,107,53,1)'; this.style.transform='translate(-50%, -50%) scale(1.1)'" 
+               onmouseout="this.style.background='rgba(255,107,53,0.9)'; this.style.transform='translate(-50%, -50%) scale(1)'">
+              <i class="fa fa-play" style="margin-left: 5px;"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fun-facts" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); padding: 60px 0; color: #fff;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="wrapper">
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="counter text-center" style="padding: 20px;">
+                  <h2 class="timer count-title count-number" data-to="500" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
+                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
+                    <i class="fa fa-users me-2"></i> Khách Hàng<br>Hài Lòng
+                  </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="counter text-center" style="padding: 20px;">
+                  <h2 class="timer count-title count-number" data-to="10" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
+                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
+                    <i class="fa fa-calendar-alt me-2"></i> Năm<br>Kinh Nghiệm
+                  </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="counter text-center" style="padding: 20px;">
+                  <h2 class="timer count-title count-number" data-to="100" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
+                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
+                    <i class="fa fa-trophy me-2"></i> Sản Phẩm<br>Chất Lượng
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section best-deal" style="background: #fff; padding: 80px 0;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading text-center" style="margin-bottom: 50px;">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Ưu Đãi Đặc Biệt</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 36px; line-height: 1.3;">Sản Phẩm Bán Chạy Nhất</h2>
+            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Những sản phẩm được khách hàng yêu thích nhất với giá ưu đãi đặc biệt</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="tabs-content">
+            <div class="row">
+              <div class="nav-wrapper" style="margin-bottom: 30px;">
+                <ul class="nav nav-tabs justify-content-center" role="tablist" style="border-bottom: 2px solid #eee;">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="best-seller-tab" data-bs-toggle="tab" data-bs-target="#best-seller" type="button" role="tab" aria-controls="best-seller" aria-selected="true" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                      <i class="fa fa-fire me-2" style="color: #ff6b35;"></i> Bán Chạy Nhất
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="new-arrival-tab" data-bs-toggle="tab" data-bs-target="#new-arrival" type="button" role="tab" aria-controls="new-arrival" aria-selected="false" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                      <i class="fa fa-star me-2" style="color: #ff6b35;"></i> Sản Phẩm Mới
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="special-offer-tab" data-bs-toggle="tab" data-bs-target="#special-offer" type="button" role="tab" aria-controls="special-offer" aria-selected="false" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                      <i class="fa fa-gift me-2" style="color: #ff6b35;"></i> Khuyến Mãi
+                    </button>
+                  </li>
+                </ul>
+              </div>              
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="best-seller" role="tabpanel" aria-labelledby="best-seller-tab">
+                  <div class="row align-items-center" style="background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                    <div class="col-lg-4">
+                      <div class="info-table" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
+                        <h5 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; text-align: center;">
+                          <i class="fa fa-info-circle me-2" style="color: #ff6b35;"></i> Thông Tin Sản Phẩm
+                        </h5>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-check-circle me-2" style="color: #4CAF50;"></i>
+                            <strong>100% Nguyên Chất</strong>
+                            <span style="float: right; color: #7f8c8d;">Đảm bảo</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-check-circle me-2" style="color: #4CAF50;"></i>
+                            <strong>Không Chất Bảo Quản</strong>
+                            <span style="float: right; color: #7f8c8d;">An toàn</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-check-circle me-2" style="color: #4CAF50;"></i>
+                            <strong>Giao Hàng Nhanh</strong>
+                            <span style="float: right; color: #7f8c8d;">24/7</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-check-circle me-2" style="color: #4CAF50;"></i>
+                            <strong>Đổi Trả Dễ Dàng</strong>
+                            <span style="float: right; color: #7f8c8d;">7 ngày</span>
+                          </li>
+                          <li>
+                            <i class="fa fa-check-circle me-2" style="color: #4CAF50;"></i>
+                            <strong>Hỗ Trợ Tư Vấn</strong>
+                            <span style="float: right; color: #7f8c8d;">Miễn phí</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                        <img src="~/assets/images/deal-01.jpg" alt="Sản phẩm bán chạy" style="width: 100%; height: auto; display: block;">
+                      </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Mật Ong Hoa Nhãn</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Mật ong hoa nhãn với hương vị đặc trưng, ngọt thanh tự nhiên. Sản phẩm được thu hoạch từ các vườn nhãn tại Tây Nguyên, đảm bảo chất lượng và độ tinh khiết cao nhất.</p>
+                      <div class="icon-button">
+                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                          <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="new-arrival" role="tabpanel" aria-labelledby="new-arrival-tab">
+                  <div class="row align-items-center" style="background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                    <div class="col-lg-4">
+                      <div class="info-table" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
+                        <h5 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; text-align: center;">
+                          <i class="fa fa-sparkles me-2" style="color: #ff6b35;"></i> Sản Phẩm Mới
+                        </h5>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-star me-2" style="color: #FFD700;"></i>
+                            <strong>Mới Nhập</strong>
+                            <span style="float: right; color: #7f8c8d;">2024</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-leaf me-2" style="color: #4CAF50;"></i>
+                            <strong>Hữu Cơ</strong>
+                            <span style="float: right; color: #7f8c8d;">100%</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-award me-2" style="color: #2196F3;"></i>
+                            <strong>Chứng Nhận</strong>
+                            <span style="float: right; color: #7f8c8d;">ISO</span>
+                          </li>
+                          <li>
+                            <i class="fa fa-heart me-2" style="color: #e91e63;"></i>
+                            <strong>Yêu Thích</strong>
+                            <span style="float: right; color: #7f8c8d;">★★★★★</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                        <img src="~/assets/images/deal-02.jpg" alt="Sản phẩm mới" style="width: 100%; height: auto; display: block;">
+                      </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Mật Ong Rừng</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Mật ong rừng nguyên chất từ các khu rừng nguyên sinh, mang hương vị đậm đà và nhiều dưỡng chất quý giá. Sản phẩm được thu hoạch thủ công, đảm bảo chất lượng cao nhất.</p>
+                      <div class="icon-button">
+                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                          <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="special-offer" role="tabpanel" aria-labelledby="special-offer-tab">
+                  <div class="row align-items-center" style="background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                    <div class="col-lg-4">
+                      <div class="info-table" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
+                        <h5 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; text-align: center;">
+                          <i class="fa fa-gift me-2" style="color: #ff6b35;"></i> Khuyến Mãi
+                        </h5>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-percent me-2" style="color: #e74c3c;"></i>
+                            <strong>Giảm 20%</strong>
+                            <span style="float: right; color: #e74c3c; font-weight: 700;">Hôm nay</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-truck me-2" style="color: #2196F3;"></i>
+                            <strong>Miễn Phí Ship</strong>
+                            <span style="float: right; color: #7f8c8d;">Đơn >500k</span>
+                          </li>
+                          <li style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <i class="fa fa-gift me-2" style="color: #9C27B0;"></i>
+                            <strong>Tặng Kèm</strong>
+                            <span style="float: right; color: #7f8c8d;">Quà tặng</span>
+                          </li>
+                          <li>
+                            <i class="fa fa-clock me-2" style="color: #ff6b35;"></i>
+                            <strong>Còn Lại</strong>
+                            <span style="float: right; color: #e74c3c; font-weight: 700;">2 ngày</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;">
+                        <img src="~/assets/images/deal-03.jpg" alt="Khuyến mãi" style="width: 100%; height: auto; display: block;">
+                        <div style="position: absolute; top: 20px; right: 20px; background: rgba(231,76,60,0.95); color: #fff; padding: 15px 20px; border-radius: 50%; font-weight: 700; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                          -20%
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Combo Đặc Biệt</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Combo 3 chai mật ong với giá ưu đãi đặc biệt. Tiết kiệm đến 20% khi mua combo. Sản phẩm đa dạng, phù hợp cho gia đình sử dụng lâu dài.</p>
+                      <div class="icon-button">
+                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                          <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="properties section" style="background: #f8f9fa; padding: 80px 0;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading text-center" style="margin-bottom: 50px;">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Sản Phẩm Nổi Bật</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 36px; line-height: 1.3;">Sản Phẩm Mật Ong Chất Lượng Cao</h2>
+            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Khám phá bộ sưu tập mật ong thiên nhiên nguyên chất, được tuyển chọn kỹ lưỡng từ các vùng nguyên liệu tốt nhất</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        @if (featuredProducts.Any())
+        {
+            @foreach (var item in featuredProducts)
+            {
+                var product = item.Product;
+                var imageUrl = !string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : (product?.ImageUrl ?? "/assets/images/property-01.jpg");
+                var title = !string.IsNullOrEmpty(item.Title) ? item.Title : (product?.Name ?? "Sản phẩm nổi bật");
+                var subtitle = !string.IsNullOrEmpty(item.Subtitle) ? item.Subtitle : (product?.Category?.Name ?? "Mật Ong Nguyên Chất");
+                var price = product?.Price ?? 0;
+                var productLink = product != null ? Url.Action("Details", "Shop", new { id = product.Id }) : "#";
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <div class="item" style="background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column;">
+                    <div style="position: relative; overflow: hidden;">
+                      <a href="@productLink" style="display: block; position: relative; overflow: hidden;">
+                        <img src="@imageUrl" alt="@title" style="width: 100%; height: 280px; object-fit: cover; transition: transform 0.3s ease;" onerror="this.src='/assets/images/property-01.jpg'; this.onerror=null;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <div style="position: absolute; top: 15px; left: 15px; background: rgba(255,107,53,0.9); color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                          <i class="fa fa-star me-1"></i> Nổi bật
+            </div>
+                        @if (product != null && product.Stock <= 10)
+                        {
+                          <div style="position: absolute; top: 15px; right: 15px; background: rgba(255,0,0,0.9); color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                            <i class="fa fa-exclamation-triangle me-1"></i> Sắp hết
+          </div>
+                        }
+                      </a>
+        </div>
+                    <div style="padding: 25px; flex-grow: 1; display: flex; flex-direction: column;">
+                      <span class="category" style="color: #ff6b35; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block;">
+                        <i class="fa fa-tag me-1"></i> @subtitle
+                      </span>
+                      @if (price > 0)
+                      {
+                        <h6 style="color: #e74c3c; font-size: 24px; font-weight: 700; margin: 10px 0; font-family: 'Arial', sans-serif;">
+                          @price.ToString("#,##0") <span style="font-size: 16px; color: #7f8c8d;">VNĐ</span>
+                        </h6>
+                      }
+                      <h4 style="margin: 15px 0; line-height: 1.4;">
+                        <a href="@productLink" style="color: #2c3e50; text-decoration: none; font-weight: 600; font-size: 18px; transition: color 0.3s;" onmouseover="this.style.color='#ff6b35'" onmouseout="this.style.color='#2c3e50'">@title</a>
+                      </h4>
+                      @if (!string.IsNullOrEmpty(item.Description))
+                      {
+                        <p style="color: #7f8c8d; font-size: 14px; line-height: 1.6; margin-bottom: 15px; flex-grow: 1;">@(item.Description.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description)</p>
+                      }
+                      @if (product != null)
+                      {
+                        <ul style="list-style: none; padding: 0; margin: 15px 0; border-top: 1px solid #eee; padding-top: 15px;">
+                            @if (product.Volume.HasValue)
+                            {
+                                <li style="margin-bottom: 8px; color: #555; font-size: 14px;">
+                                  <i class="fa fa-flask me-2" style="color: #ff6b35; width: 20px;"></i>
+                                  Dung tích: <span style="font-weight: 600; color: #2c3e50;">@product.Volume @product.Unit</span>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(product.Origin))
+                            {
+                                <li style="margin-bottom: 8px; color: #555; font-size: 14px;">
+                                  <i class="fa fa-map-marker-alt me-2" style="color: #ff6b35; width: 20px;"></i>
+                                  Xuất xứ: <span style="font-weight: 600; color: #2c3e50;">@product.Origin</span>
+                                </li>
+                            }
+                            <li style="margin-bottom: 8px; color: #555; font-size: 14px;">
+                              <i class="fa fa-box me-2" style="color: #ff6b35; width: 20px;"></i>
+                              Tồn kho: <span style="font-weight: 600; color: @(product.Stock <= 10 ? "#e74c3c" : "#27ae60");">@product.Stock sản phẩm</span>
+                            </li>
+            </ul>
+                      }
+                      <div class="main-button" style="margin-top: auto;">
+                        <a href="@productLink" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                          <i class="fa fa-shopping-cart me-2"></i> Xem chi tiết
+                        </a>
+            </div>
+          </div>
+        </div>
+            </div>
+            }
+        }
+        else
+        {
+            <!-- Fallback nếu không có sản phẩm nổi bật -->
+            <div class="col-lg-4 col-md-6 mb-4">
+              <div class="item" style="background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                <a href="#"><img src="~/assets/images/property-01.jpg" alt="" style="width: 100%; height: 280px; object-fit: cover;"></a>
+                <div style="padding: 25px;">
+                  <span class="category" style="color: #ff6b35; font-size: 13px; font-weight: 600;">Mật Ong Nguyên Chất</span>
+                  <h6 style="color: #e74c3c; font-size: 24px; font-weight: 700; margin: 10px 0;">200.000 <span style="font-size: 16px; color: #7f8c8d;">VNĐ</span></h6>
+                  <h4><a href="#" style="color: #2c3e50; text-decoration: none; font-weight: 600;">Mật ong hoa nhãn 500ml</a></h4>
+                  <ul style="list-style: none; padding: 0; margin: 15px 0; border-top: 1px solid #eee; padding-top: 15px;">
+                    <li style="margin-bottom: 8px; color: #555;"><i class="fa fa-flask me-2" style="color: #ff6b35;"></i> Dung tích: <span style="font-weight: 600;">500ml</span></li>
+                    <li style="margin-bottom: 8px; color: #555;"><i class="fa fa-map-marker-alt me-2" style="color: #ff6b35;"></i> Xuất xứ: <span style="font-weight: 600;">Tây Nguyên</span></li>
+                    <li style="margin-bottom: 8px; color: #555;"><i class="fa fa-box me-2" style="color: #ff6b35;"></i> Tồn kho: <span style="font-weight: 600;">50 sản phẩm</span></li>
+            </ul>
+                  <div class="main-button" style="margin-top: 15px;">
+                    <a href="#" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600;">
+                      <i class="fa fa-shopping-cart me-2"></i> Xem chi tiết
+                    </a>
+            </div>
+          </div>
+        </div>
+            </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="contact section" style="padding: 60px 0; background: #fff;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading text-center">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Liên Hệ</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 32px;">Liên Hệ Với Chúng Tôi</h2>
+            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về sản phẩm mật ong</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-7">
+          <div style="position: relative; margin-bottom: 15px;">
+            <button type="button" id="findMyLocationBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none; padding: 10px 20px; border-radius: 25px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(255,107,53,0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+              <i class="fa fa-map-marker-alt me-2"></i> Tìm vị trí của tôi
+            </button>
+            <div id="locationStatus" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; color: #28a745; font-weight: 500;">
+              <i class="fa fa-check-circle me-2"></i> <span id="locationText"></span>
+            </div>
+          </div>
+          <div id="map" style="position: relative;">
+            <iframe id="mapFrame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12469.776493332698!2d-80.14036379941481!3d25.907788681148624!2m3!1f357.26927939317244!2f20.870722720054623!3f0!3m2!1i1024!2i768!4f35!3m3!1m2!1s0x88d9add4b4ac788f%3A0xe77469d09480fcdb!2sSunny%20Isles%20Beach!5e1!3m2!1sen!2sth!4v1642869952544!5m2!1sen!2sth" width="100%" height="500px" frameborder="0" style="border:0; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);" allowfullscreen=""></iframe>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="item phone">
+                <img src="~/assets/images/phone-icon.png" alt="" style="max-width: 52px;">
+                <h6>010-020-0340<br><span>Phone Number</span></h6>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="item email">
+                <img src="~/assets/images/email-icon.png" alt="" style="max-width: 52px;">
+                <h6>info@matong.com<br><span>Email liên hệ</span></h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <form id="contact-form" action="@Url.Action("SendMessage", "Contact")" method="post">
+            @Html.AntiForgeryToken()
+            @if (TempData["SuccessMessage"] != null)
+            {
+              <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                <i class="fa fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+              <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                <i class="fa fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            }
+            <div class="row">
+              <div class="col-lg-12">
+                <fieldset>
+                  <label for="name">Họ và Tên <span style="color: red;">*</span></label>
+                  <input type="text" name="name" id="name" placeholder="Nhập họ và tên của bạn..." autocomplete="on" required>
+                </fieldset>
+              </div>
+              <div class="col-lg-12">
+                <fieldset>
+                  <label for="email">Email <span style="color: red;">*</span></label>
+                  <input type="email" name="email" id="email" placeholder="Nhập email của bạn..." required>
+                </fieldset>
+              </div>
+              <div class="col-lg-12">
+                <fieldset>
+                  <label for="subject">Tiêu đề</label>
+                  <input type="text" name="subject" id="subject" placeholder="Nhập tiêu đề (tùy chọn)..." autocomplete="on">
+                </fieldset>
+              </div>
+              <div class="col-lg-12">
+                <fieldset>
+                  <label for="message">Nội dung tin nhắn <span style="color: red;">*</span></label>
+                  <textarea name="message" id="message" placeholder="Nhập nội dung tin nhắn của bạn..." rows="5" required></textarea>
+                </fieldset>
+              </div>
+              <div class="col-lg-12">
+                <fieldset>
+                  <button type="submit" id="form-submit" class="orange-button" style="width: 100%; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; border: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                    <i class="fa fa-paper-plane me-2"></i> Gửi Tin Nhắn
+                  </button>
+                </fieldset>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 </div>
+
+<style>
+  /* Custom styles for tabs */
+  .nav-tabs .nav-link {
+    transition: all 0.3s ease;
+  }
+  
+  .nav-tabs .nav-link.active {
+    color: #ff6b35 !important;
+    border-bottom: 3px solid #ff6b35 !important;
+    background: transparent !important;
+  }
+  
+  .nav-tabs .nav-link:hover {
+    color: #ff6b35 !important;
+    border-bottom: 3px solid rgba(255,107,53,0.3) !important;
+  }
+  
+  /* Product card hover effect */
+  .properties .item {
+    transition: all 0.3s ease;
+  }
+  
+  .properties .item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  }
+  
+  /* Featured section improvements */
+  .featured .accordion-button:not(.collapsed) {
+    background: #fff8e1;
+    color: #2c3e50;
+  }
+  
+  .featured .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255,107,53,0.25);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const findLocationBtn = document.getElementById('findMyLocationBtn');
+    const locationStatus = document.getElementById('locationStatus');
+    const locationText = document.getElementById('locationText');
+    const mapFrame = document.getElementById('mapFrame');
+    
+    if (findLocationBtn) {
+        findLocationBtn.addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                locationStatus.style.display = 'block';
+                locationStatus.style.background = '#f8d7da';
+                locationStatus.style.color = '#721c24';
+                locationText.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i> Trình duyệt của bạn không hỗ trợ định vị địa lý.';
+                return;
+            }
+            
+            findLocationBtn.disabled = true;
+            findLocationBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Đang tìm vị trí...';
+            locationStatus.style.display = 'block';
+            locationStatus.style.background = '#d1ecf1';
+            locationStatus.style.color = '#0c5460';
+            locationText.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Đang lấy vị trí của bạn...';
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Cập nhật iframe với vị trí mới
+                    const newMapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat}%2C${lng}!5e0!3m2!1sen!2s!4v${Date.now()}!5m2!1sen!2s`;
+                    mapFrame.src = newMapUrl;
+                    
+                    // Hiển thị thông báo thành công
+                    locationStatus.style.background = '#d4edda';
+                    locationStatus.style.color = '#155724';
+                    locationText.innerHTML = `<i class="fa fa-check-circle me-2"></i> Đã tìm thấy vị trí của bạn! (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                    
+                    // Mở Google Maps trong tab mới với vị trí hiện tại
+                    const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                    window.open(googleMapsUrl, '_blank');
+                    
+                    findLocationBtn.disabled = false;
+                    findLocationBtn.innerHTML = '<i class="fa fa-map-marker-alt me-2"></i> Tìm vị trí của tôi';
+                },
+                function(error) {
+                    findLocationBtn.disabled = false;
+                    findLocationBtn.innerHTML = '<i class="fa fa-map-marker-alt me-2"></i> Tìm vị trí của tôi';
+                    
+                    let errorMessage = 'Không thể lấy vị trí của bạn. ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Bạn đã từ chối quyền truy cập vị trí.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Thông tin vị trí không khả dụng.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Yêu cầu lấy vị trí đã hết thời gian.';
+                            break;
+                        default:
+                            errorMessage += 'Đã xảy ra lỗi không xác định.';
+                            break;
+                    }
+                    
+                    locationStatus.style.display = 'block';
+                    locationStatus.style.background = '#f8d7da';
+                    locationStatus.style.color = '#721c24';
+                    locationText.innerHTML = `<i class="fa fa-exclamation-circle me-2"></i> ${errorMessage}`;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+    }
+});
+</script>

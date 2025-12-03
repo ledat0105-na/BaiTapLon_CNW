@@ -1,0 +1,106 @@
+@model WebHoney.Models.Category
+@{
+    ViewData["Title"] = "Chi tiết danh mục";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Chi tiết danh mục</h5>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                    <i class="fa fa-edit"></i> Chỉnh sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary btn-sm">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Mã danh mục:</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Tên danh mục:</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Slug:</dt>
+                <dd class="col-sm-9">@Model.Slug</dd>
+
+                <dt class="col-sm-3">Mô tả:</dt>
+                <dd class="col-sm-9">@(Model.Description ?? "-")</dd>
+
+                <dt class="col-sm-3">Trạng thái:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Đang hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Đã vô hiệu hóa</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Số sản phẩm:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-info">@(Model.Products?.Count ?? 0) sản phẩm</span>
+                </dd>
+
+                <dt class="col-sm-3">Ngày tạo:</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <dt class="col-sm-3">Ngày cập nhật:</dt>
+                    <dd class="col-sm-9">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                }
+            </dl>
+
+            @if (Model.Products != null && Model.Products.Any())
+            {
+                <hr>
+                <h5>Sản phẩm trong danh mục</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Tồn kho</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.Products)
+                            {
+                                <tr>
+                                    <td>@product.Name</td>
+                                    <td>@product.Price.ToString("#,##0") VNĐ</td>
+                                    <td>@product.Stock</td>
+                                    <td>
+                                        @if (product.IsActive)
+                                        {
+                                            <span class="badge bg-success">Đang bán</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Ngừng bán</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-sm btn-info">
+                                            <i class="fa fa-eye"></i> Xem
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

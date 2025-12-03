@@ -1,50 +1,172 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebHoney</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebHoney.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebHoney</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - WebHoney - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <title>@ViewData["Title"] - Web bán mật ong</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="~/assets/css/fontawesome.css">
+    <link rel="stylesheet" href="~/assets/css/templatemo-villa-agency.css">
+    <link rel="stylesheet" href="~/assets/css/owl.css">
+    <link rel="stylesheet" href="~/assets/css/animate.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+</head>
+
+<body>
+
+  <!-- ***** Preloader Start ***** -->
+  <div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+      <span class="dot"></span>
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <!-- ***** Preloader End ***** -->
+
+  <div class="sub-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-8">
+          <ul class="info">
+            <li><i class="fa fa-envelope"></i> info@company.com</li>
+            <li><i class="fa fa-map"></i> Sunny Isles Beach, FL 33160</li>
+          </ul>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+        <div class="col-lg-4 col-md-4">
+          <ul class="social-links">
+            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+            <li><a href="https://x.com/minthu" target="_blank"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+            <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ***** Header Area Start ***** -->
+  <header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a asp-controller="Home" asp-action="Index" class="logo">
+                        <h1 style="white-space: nowrap; line-height: 1.2;">Mật Ong</h1>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                      <li><a asp-controller="Home" asp-action="Index" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">Trang chủ</a></li>
+                      <li><a asp-controller="Shop" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Shop" ? "active" : "")">Sản phẩm</a></li>
+                      <li><a asp-controller="Home" asp-action="Contact" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Contact" ? "active" : "")">Liên hệ</a></li>
+                      <li>
+                          <a asp-controller="Cart" asp-action="Index" id="cart-link">
+                              <i class="fa fa-shopping-cart"></i> Giỏ hàng 
+                              <span class="badge bg-danger" id="cart-badge" style="display: none;">0</span>
+                          </a>
+                      </li>
+                      @{
+                          var userId = Context.Session.GetString("UserId");
+                          var username = Context.Session.GetString("Username");
+                          var fullName = Context.Session.GetString("FullName");
+                          var role = Context.Session.GetString("Role");
+                      }
+                      @if (!string.IsNullOrEmpty(userId))
+                      {
+                          <li>
+                              <a href="#">
+                                  <i class="fa fa-user"></i> @(string.IsNullOrEmpty(fullName) ? username : fullName)
+                                  @if (role == "ADMIN" || role == "Admin")
+                                  {
+                                      <span class="badge badge-danger" style="background-color: #dc3545; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-left: 5px;">Admin</span>
+                                  }
+                              </a>
+                          </li>
+                          @if (role == "ADMIN" || role == "Admin")
+                          {
+                              <li><a asp-controller="Admin" asp-action="Index"><i class="fa fa-dashboard"></i> Quản trị</a></li>
+                          }
+                          <li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
+                      }
+                      else
+                      {
+                          <li><a asp-controller="Account" asp-action="Login"><i class="fa fa-sign-in"></i> Đăng nhập</a></li>
+                          <li><a asp-controller="Account" asp-action="Register"><i class="fa fa-user-plus"></i> Đăng ký</a></li>
+                      }
+                  </ul>   
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+                
+            </div>
+        </div>
+    </div>
+  </header>
+  <!-- ***** Header Area End ***** -->
+
+  <main>
+    @RenderBody()
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="col-lg-8">
+        <p>Copyright © 2025 Web bán mật ong. All rights reserved. 
+        
+        Design: <a rel="nofollow" href="https://templatemo.com" target="_blank">TemplateMo</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Bootstrap core JavaScript -->
+  <script src="~/vendor/jquery/jquery.min.js"></script>
+  <script src="~/vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="~/assets/js/isotope.min.js"></script>
+  <script src="~/assets/js/owl-carousel.js"></script>
+  <script src="~/assets/js/counter.js"></script>
+  <script src="~/assets/js/custom.js"></script>
+  
+  @await RenderSectionAsync("Scripts", required: false)
+  
+  <script>
+    // Hàm cập nhật số lượng giỏ hàng
+    function updateCartCount() {
+      fetch('/Cart/Count')
+        .then(response => response.json())
+        .then(data => {
+          const badge = document.getElementById('cart-badge');
+          if (badge) {
+            if (data.count > 0) {
+              badge.textContent = data.count;
+              badge.style.display = 'inline';
+            } else {
+              badge.style.display = 'none';
+            }
+          }
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+    }
+    
+    // Cập nhật số lượng khi trang load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+    });
+  </script>
 </body>
 </html>

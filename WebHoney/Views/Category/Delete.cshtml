@@ -1,0 +1,61 @@
+@model WebHoney.Models.Category
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Xóa danh mục</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                <p>Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.</p>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Mã danh mục:</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Tên danh mục:</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Mô tả:</dt>
+                <dd class="col-sm-9">@(Model.Description ?? "-")</dd>
+
+                <dt class="col-sm-3">Số sản phẩm:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-info">@(Model.Products?.Count ?? 0) sản phẩm</span>
+                    @if (Model.Products != null && Model.Products.Any())
+                    {
+                        <small class="text-danger d-block mt-1">Danh mục có sản phẩm, xóa có thể ảnh hưởng đến dữ liệu!</small>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Trạng thái:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Đang hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Đã vô hiệu hóa</span>
+                    }
+                </dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-3">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Xác nhận xóa
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fa fa-times"></i> Hủy
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,123 @@
+@model WebHoney.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a> / Đăng ký</span>
+                <h3>Đăng ký</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contact-page section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="section-heading text-center">
+                    <h6>| Đăng ký</h6>
+                    <h2>Tạo tài khoản mới</h2>
+                </div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Username" class="form-control" placeholder="Nhập tên đăng nhập" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại (tùy chọn)" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ</label>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label asp-for="Street" class="form-label small">Số nhà, tên đường</label>
+                                <input asp-for="Street" id="Street" class="form-control" placeholder="Ví dụ: 123 Đường ABC" />
+                                <span asp-validation-for="Street" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="ProvinceCode" class="form-label small">Tỉnh/Thành phố</label>
+                                <select asp-for="ProvinceCode" id="ProvinceCode" class="form-select">
+                                    <option value="">-- Chọn tỉnh/thành phố --</option>
+                                </select>
+                                <span asp-validation-for="ProvinceCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DistrictCode" class="form-label small">Quận/Huyện</label>
+                                <select asp-for="DistrictCode" id="DistrictCode" class="form-select" disabled>
+                                    <option value="">-- Chọn quận/huyện --</option>
+                                </select>
+                                <span asp-validation-for="DistrictCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="WardCode" class="form-label small">Phường/Xã</label>
+                                <select asp-for="WardCode" id="WardCode" class="form-select" disabled>
+                                    <option value="">-- Chọn phường/xã --</option>
+                                </select>
+                                <span asp-validation-for="WardCode" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <input type="hidden" asp-for="Address" id="Address" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="orange-button" style="width: 100%;">Đăng ký</button>
+                    </div>
+
+                    <div class="text-center">
+                        <p>Đã có tài khoản? <a asp-action="Login">Đăng nhập ngay</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/address-selector.js"></script>
+}
+

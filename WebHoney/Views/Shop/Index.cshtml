@@ -1,0 +1,156 @@
+@model List<WebHoney.Models.Product>
+@{
+    ViewData["Title"] = "Sản phẩm mật ong";
+    var categories = (List<WebHoney.Models.Category>)ViewData["Categories"] ?? new List<WebHoney.Models.Category>();
+    var search = ViewData["Search"]?.ToString();
+    var categoryId = ViewData["CategoryId"] as long?;
+    var sortBy = ViewData["SortBy"]?.ToString() ?? "";
+    var page = (int)ViewData["Page"]!;
+    var pageSize = (int)ViewData["PageSize"]!;
+    var totalItems = (int)ViewData["TotalItems"]!;
+    var totalPages = (int)ViewData["TotalPages"]!;
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a> / Sản phẩm</span>
+                <h3>Sản phẩm mật ong</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section best-deal">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar: Filter -->
+            <div class="col-lg-3">
+                <div class="filter-form">
+                    <h4>Bộ lọc</h4>
+                    <form method="get" asp-controller="Shop" asp-action="Index">
+                        <input type="hidden" name="page" value="1" />
+                        
+                        <!-- Tìm kiếm -->
+                        <div class="mb-3">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" name="search" class="form-control" value="@search" placeholder="Nhập tên sản phẩm...">
+                        </div>
+
+                        <!-- Danh mục -->
+                        <div class="mb-3">
+                            <label class="form-label">Danh mục</label>
+                            <select name="categoryId" class="form-select" onchange="this.form.submit()">
+                                <option value="">Tất cả danh mục</option>
+                                @foreach (var category in categories)
+                                {
+                                    <option value="@category.Id" selected="@(categoryId == category.Id)">@category.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sắp xếp -->
+                        <div class="mb-3">
+                            <label class="form-label">Sắp xếp</label>
+                            <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                                <option value="">Mới nhất</option>
+                                <option value="price_asc" selected="@(sortBy == "price_asc")">Giá: Tăng dần</option>
+                                <option value="price_desc" selected="@(sortBy == "price_desc")">Giá: Giảm dần</option>
+                                <option value="name_asc" selected="@(sortBy == "name_asc")">Tên: A-Z</option>
+                                <option value="name_desc" selected="@(sortBy == "name_desc")">Tên: Z-A</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Main Content: Products -->
+            <div class="col-lg-9">
+                @if (Model.Any())
+                {
+                    <div class="row">
+                        @foreach (var product in Model)
+                        {
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="item">
+                                    <a href="@Url.Action("Details", "Shop", new { id = product.Id })">
+                                        <img src="@(product.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@product.Name" style="width: 100%; height: 250px; object-fit: cover;">
+                                    </a>
+                                    <span class="category">@product.Category?.Name</span>
+                                    <h6><a href="@Url.Action("Details", "Shop", new { id = product.Id })">@product.Name</a></h6>
+                                    <span class="price">@product.Price.ToString("#,##0") VNĐ</span>
+                                    @if (product.Volume.HasValue)
+                                    {
+                                        <span class="volume">@product.Volume @product.Unit</span>
+                                    }
+                                    <div class="main-button">
+                                        <a href="@Url.Action("Details", "Shop", new { id = product.Id })">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages > 1)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @if (page > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=@(page - 1)&search=@search&categoryId=@categoryId&sortBy=@sortBy">Trước</a>
+                                    </li>
+                                }
+                                
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    if (i == page)
+                                    {
+                                        <li class="page-item active">
+                                            <span class="page-link">@i</span>
+                                        </li>
+                                    }
+                                    else if (i == 1 || i == totalPages || (i >= page - 2 && i <= page + 2))
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=@i&search=@search&categoryId=@categoryId&sortBy=@sortBy">@i</a>
+                                        </li>
+                                    }
+                                    else if (i == page - 3 || i == page + 3)
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    }
+                                }
+                                
+                                @if (page < totalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=@(page + 1)&search=@search&categoryId=@categoryId&sortBy=@sortBy">Sau</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+
+                    <div class="text-center mt-3">
+                        <p>Hiển thị @((page - 1) * pageSize + 1) - @(Math.Min(page * pageSize, totalItems)) trong tổng số @totalItems sản phẩm</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <h4>Không tìm thấy sản phẩm</h4>
+                        <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với bộ lọc khác.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

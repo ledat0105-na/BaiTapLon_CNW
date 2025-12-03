@@ -1,0 +1,79 @@
+@model WebHoney.Models.Customer
+@{
+    ViewData["Title"] = "Chỉnh sửa khách hàng";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-action="Index">Khách hàng</a> / Chỉnh sửa</span>
+                <h3>Chỉnh sửa thông tin khách hàng</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contact-page section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="section-heading">
+                    <h6>| Thông tin khách hàng</h6>
+                    <h2>Cập nhật thông tin khách hàng #@Model.CustomerId</h2>
+                </div>
+
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="CustomerId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên khách hàng" required />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label"></label>
+                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Ngày tạo: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Cập nhật thông tin
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                        <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-info">
+                            <i class="fas fa-eye"></i> Xem chi tiết
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

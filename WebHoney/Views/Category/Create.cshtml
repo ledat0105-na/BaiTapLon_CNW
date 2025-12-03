@@ -1,0 +1,43 @@
+@model WebHoney.Models.Category
+@{
+    ViewData["Title"] = "Thêm danh mục mới";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Thêm danh mục mới</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Tên danh mục *</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ví dụ: Mật ong rừng" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả về danh mục"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Lưu
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fa fa-times"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

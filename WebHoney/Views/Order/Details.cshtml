@@ -1,0 +1,135 @@
+@model WebHoney.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Chi tiết đơn hàng #@Model.OrderId</h5>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Thông tin đơn hàng -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6>Thông tin khách hàng</h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Tên khách hàng:</th>
+                            <td>@(Model.Customer?.FullName ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <th>Số điện thoại:</th>
+                            <td>@Model.Phone</td>
+                        </tr>
+                        <tr>
+                            <th>Địa chỉ:</th>
+                            <td>@Model.ShippingAddress</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Thông tin đơn hàng</h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Trạng thái:</th>
+                            <td>
+                                @switch (Model.Status)
+                                {
+                                    case "PENDING":
+                                        <span class="badge bg-warning">Chờ xử lý</span>
+                                        break;
+                                    case "PROCESSING":
+                                        <span class="badge bg-info">Đang xử lý</span>
+                                        break;
+                                    case "SHIPPING":
+                                        <span class="badge bg-primary">Đang giao</span>
+                                        break;
+                                    case "COMPLETED":
+                                        <span class="badge bg-success">Hoàn thành</span>
+                                        break;
+                                    case "CANCELED":
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Ngày đặt:</th>
+                            <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <th>Tổng tiền:</th>
+                            <td><strong class="text-danger">@Model.TotalAmount.ToString("#,##0") VNĐ</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cập nhật trạng thái -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6>Cập nhật trạng thái</h6>
+                    <form asp-action="UpdateStatus" method="post" class="row g-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="col-md-4">
+                            <select name="status" class="form-select" required>
+                                <option value="PENDING" selected="@(Model.Status == "PENDING")">Chờ xử lý</option>
+                                <option value="PROCESSING" selected="@(Model.Status == "PROCESSING")">Đang xử lý</option>
+                                <option value="SHIPPING" selected="@(Model.Status == "SHIPPING")">Đang giao</option>
+                                <option value="COMPLETED" selected="@(Model.Status == "COMPLETED")">Hoàn thành</option>
+                                <option value="CANCELED" selected="@(Model.Status == "CANCELED")">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Cập nhật trạng thái
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Chi tiết sản phẩm -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h6>Chi tiết sản phẩm</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.UnitPrice.ToString("#,##0") VNĐ</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.LineTotal.ToString("#,##0") VNĐ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Tổng tiền:</th>
+                                    <th>@Model.TotalAmount.ToString("#,##0") VNĐ</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
