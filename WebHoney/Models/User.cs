@@ -53,6 +53,9 @@ public class User
     
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+
+    [Column("last_login_at")]
+    public DateTime? LastLoginAt { get; set; }
     
     // Property để tương thích với code hiện tại (không lưu vào DB)
     [NotMapped]

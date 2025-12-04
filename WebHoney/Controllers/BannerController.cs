@@ -55,32 +55,54 @@ public class BannerController : Controller
     // POST: Banner/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(IFormFile? imageFile, [Bind("Title,Subtitle,DisplayOrder,IsActive")] BannerImage banner)
+    public async Task<IActionResult> Create(IFormFile? imageFile, string? imageUrl, [Bind("Title,Subtitle,DisplayOrder,IsActive")] BannerImage banner)
     {
-        if (imageFile == null || imageFile.Length == 0)
-        {
-            ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh banner.");
-            return View(banner);
-        }
-
-        // Kiểm tra định dạng ảnh
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-        var fileExtension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
-        if (!allowedExtensions.Contains(fileExtension))
-        {
-            ModelState.AddModelError("ImageFile", "Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp).");
-            return View(banner);
-        }
-
-        // Kiểm tra kích thước file (max 5MB)
-        if (imageFile.Length > 5 * 1024 * 1024)
-        {
-            ModelState.AddModelError("ImageFile", "Kích thước file không được vượt quá 5MB.");
-            return View(banner);
-        }
-
         try
         {
+            // Trường hợp dùng URL ảnh bên ngoài hoặc ảnh có sẵn trong wwwroot
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                banner.ImageUrl = imageUrl.Trim();
+                banner.CreatedAt = DateTime.Now;
+
+                if (banner.DisplayOrder == 0)
+                {
+                    var maxOrder = await _context.BannerImages
+                        .Select(b => (int?)b.DisplayOrder)
+                        .DefaultIfEmpty(0)
+                        .MaxAsync();
+                    banner.DisplayOrder = maxOrder.Value + 1;
+                }
+
+                _context.Add(banner);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Thêm banner thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Nếu không có URL thì bắt buộc phải upload file
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh banner hoặc nhập URL ảnh.");
+                return View(banner);
+            }
+
+            // Kiểm tra định dạng ảnh
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var fileExtension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                ModelState.AddModelError("ImageFile", "Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp).");
+                return View(banner);
+            }
+
+            // Kiểm tra kích thước file (max 5MB)
+            if (imageFile.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError("ImageFile", "Kích thước file không được vượt quá 5MB.");
+                return View(banner);
+            }
+
             // Tạo thư mục uploads/banners nếu chưa có
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
             if (!Directory.Exists(uploadsFolder))
@@ -120,8 +142,8 @@ public class BannerController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Lỗi khi upload banner");
-            ModelState.AddModelError("", "Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.");
+            _logger.LogError(ex, "Lỗi khi tạo banner");
+            ModelState.AddModelError("", "Có lỗi xảy ra khi tạo banner. Vui lòng thử lại.");
             return View(banner);
         }
     }
@@ -138,7 +160,7 @@ public class BannerController : Controller
     // POST: Banner/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(long id, IFormFile? imageFile, string? imageUrl, [Bind("Id,ImageUrl,Title,Subtitle,DisplayOrder,IsActive,CreatedAt")] BannerImage banner)
+    public async Task<IActionResult> Edit(long id, IFormFile? imageFile, [Bind("Id,ImageUrl,Title,Subtitle,DisplayOrder,IsActive,CreatedAt")] BannerImage banner)
     {
         if (id != banner.Id) return NotFound();
 
@@ -148,9 +170,9 @@ public class BannerController : Controller
             if (existingBanner == null) return NotFound();
 
             // Ưu tiên URL nếu có, sau đó mới đến file upload
-            if (!string.IsNullOrWhiteSpace(imageUrl))
+            var newImageUrl = banner.ImageUrl?.Trim();
+            if (!string.IsNullOrWhiteSpace(newImageUrl))
             {
-                var newImageUrl = imageUrl.Trim();
                 // Chỉ cập nhật nếu URL thay đổi
                 if (existingBanner.ImageUrl != newImageUrl)
                 {

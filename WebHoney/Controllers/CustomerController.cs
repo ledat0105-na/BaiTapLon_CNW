@@ -24,8 +24,9 @@ public class CustomerController : Controller
     public async Task<IActionResult> Index(string? searchString, int page = 1)
     {
         const int pageSize = 5;
-        var customers = from c in _context.Customers
-                       select c;
+        var customers = _context.Customers
+            .Include(c => c.User)
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(searchString))
         {

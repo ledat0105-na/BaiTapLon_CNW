@@ -13,10 +13,20 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="mb-3">
-                    <label for="imageFile" class="form-label">Ảnh banner *</label>
-                    <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" required />
+                    <label for="imageFile" class="form-label">Ảnh banner (upload file)</label>
+                    <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" />
                     <small class="form-text text-muted">Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp). Kích thước tối đa: 5MB</small>
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="text-center my-2">
+                    <strong class="text-muted">HOẶC</strong>
+                </div>
+
+                <div class="mb-3">
+                    <label for="imageUrlInput" class="form-label">Nhập URL hình ảnh</label>
+                    <input type="text" id="imageUrlInput" name="imageUrl" class="form-control" placeholder="https://example.com/image.jpg hoặc /assets/images/banner-01.jpg" />
+                    <small class="form-text text-muted">Nhập đường dẫn URL của hình ảnh. Nếu nhập URL, ảnh upload sẽ được bỏ qua.</small>
                 </div>
 
                 <div class="mb-3">
@@ -75,13 +85,34 @@
                         preview.style.maxWidth = '100%';
                         preview.style.height = '200px';
                         preview.style.objectFit = 'cover';
-                        e.target.parentElement.appendChild(preview);
+                        document.getElementById('imageFile').parentElement.appendChild(preview);
                     }
                     preview.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         });
+
+        // Preview ảnh từ URL
+        const urlInput = document.getElementById('imageUrlInput');
+        if (urlInput) {
+            urlInput.addEventListener('change', function () {
+                const url = urlInput.value.trim();
+                if (!url) return;
+
+                let preview = document.getElementById('image-preview');
+                if (!preview) {
+                    preview = document.createElement('img');
+                    preview.id = 'image-preview';
+                    preview.className = 'img-thumbnail mt-2';
+                    preview.style.maxWidth = '100%';
+                    preview.style.height = '200px';
+                    preview.style.objectFit = 'cover';
+                    urlInput.parentElement.appendChild(preview);
+                }
+                preview.src = url;
+            });
+        }
     </script>
 }
 

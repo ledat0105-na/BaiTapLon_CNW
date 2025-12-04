@@ -66,7 +66,7 @@
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                                         {
-                                            <img src="@item.ImageUrl" alt="@item.Name" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" onerror="this.src='/images/placeholder.png'; this.onerror=null;" />
+                                            <img src="@item.ImageUrl" alt="@item.Name" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';" />
                                         }
                                         else
                                         {

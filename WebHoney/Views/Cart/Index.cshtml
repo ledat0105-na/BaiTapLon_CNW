@@ -19,8 +19,11 @@
     <div class="container">
         @if (Model.Any())
         {
-            <div class="row">
-                <div class="col-lg-8">
+            <form id="cartForm">
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-lg-8">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -39,7 +42,8 @@
                                         <div class="d-flex align-items-center">
                                             <img src="@(item.ImageUrl ?? "/assets/images/property-01.jpg")" 
                                                  alt="@item.ProductName" 
-                                                 style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px;">
+                                                 style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px;"
+                                                 onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
                                             <div>
                                                 <strong>@item.ProductName</strong>
                                                 @if (item.Stock < 10)
@@ -54,7 +58,7 @@
                                         <div class="input-group" style="width: 120px;">
                                             <button class="btn btn-outline-secondary btn-sm" 
                                                     type="button" 
-                                                    onclick="updateQuantity(@item.ProductId, @(item.Quantity - 1))">-</button>
+                                                    onclick="changeQuantity(@item.ProductId, -1)">-</button>
                                             <input type="number" 
                                                    class="form-control form-control-sm text-center" 
                                                    id="qty-@item.ProductId" 
@@ -64,7 +68,7 @@
                                                    onchange="updateQuantity(@item.ProductId, parseInt(this.value))">
                                             <button class="btn btn-outline-secondary btn-sm" 
                                                     type="button" 
-                                                    onclick="updateQuantity(@item.ProductId, @(item.Quantity + 1))">+</button>
+                                                    onclick="changeQuantity(@item.ProductId, 1)">+</button>
                                         </div>
                                     </td>
                                     <td>
@@ -91,7 +95,7 @@
                     </table>
 
                     <div class="mt-3">
-                        <button class="btn btn-secondary" onclick="clearCart()">
+                        <button type="button" class="btn btn-secondary" onclick="clearCart()">
                             <i class="fa fa-trash"></i> Xóa toàn bộ giỏ hàng
                         </button>
                     </div>
@@ -128,6 +132,7 @@
                     </div>
                 </div>
             </div>
+            </form>
         }
         else
         {
@@ -145,6 +150,28 @@
 
 @section Scripts {
     <script>
+        function getCartToken() {
+            const form = document.getElementById('cartForm');
+            if (!form) return '';
+            const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+            return tokenInput?.value || '';
+        }
+
+        function changeQuantity(productId, delta) {
+            const input = document.getElementById('qty-' + productId);
+            if (!input) return;
+
+            const current = parseInt(input.value || '0');
+            const min = parseInt(input.min || '1');
+            const max = parseInt(input.max || '999999');
+
+            let next = current + delta;
+            if (next < min) next = min;
+            if (next > max) next = max;
+
+            updateQuantity(productId, next);
+        }
+
         function updateQuantity(productId, quantity) {
             if (quantity < 1) {
                 if (confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) {
@@ -157,7 +184,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    'RequestVerificationToken': getCartToken()
                 },
                 body: JSON.stringify({
                     productId: productId,
@@ -195,7 +222,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    'RequestVerificationToken': getCartToken()
                 },
                 body: JSON.stringify({
                     productId: productId
@@ -235,7 +262,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    'RequestVerificationToken': getCartToken()
                 }
             })
             .then(response => response.json())

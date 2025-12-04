@@ -223,20 +223,20 @@
         <div class="col-lg-12">
           <div class="tabs-content">
             <div class="row">
-              <div class="nav-wrapper" style="margin-bottom: 30px;">
+              <div class="nav-wrapper" style="margin-top: 80px; margin-bottom: 30px;">
                 <ul class="nav nav-tabs justify-content-center" role="tablist" style="border-bottom: 2px solid #eee;">
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="best-seller-tab" data-bs-toggle="tab" data-bs-target="#best-seller" type="button" role="tab" aria-controls="best-seller" aria-selected="true" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                    <button class="nav-link home-deal-tab active" id="best-seller-tab" data-bs-toggle="tab" data-bs-target="#best-seller" type="button" role="tab" aria-controls="best-seller" aria-selected="true">
                       <i class="fa fa-fire me-2" style="color: #ff6b35;"></i> Bán Chạy Nhất
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="new-arrival-tab" data-bs-toggle="tab" data-bs-target="#new-arrival" type="button" role="tab" aria-controls="new-arrival" aria-selected="false" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                    <button class="nav-link home-deal-tab" id="new-arrival-tab" data-bs-toggle="tab" data-bs-target="#new-arrival" type="button" role="tab" aria-controls="new-arrival" aria-selected="false">
                       <i class="fa fa-star me-2" style="color: #ff6b35;"></i> Sản Phẩm Mới
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="special-offer-tab" data-bs-toggle="tab" data-bs-target="#special-offer" type="button" role="tab" aria-controls="special-offer" aria-selected="false" style="color: #2c3e50; font-weight: 600; padding: 15px 30px; border: none; border-bottom: 3px solid transparent;">
+                    <button class="nav-link home-deal-tab" id="special-offer-tab" data-bs-toggle="tab" data-bs-target="#special-offer" type="button" role="tab" aria-controls="special-offer" aria-selected="false">
                       <i class="fa fa-gift me-2" style="color: #ff6b35;"></i> Khuyến Mãi
                     </button>
                   </li>
@@ -539,37 +539,10 @@
     </div>
   </div>
 
-  <div class="contact-content">
+  <div class="contact-content" style="margin-top: 60px;">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-7">
-          <div style="position: relative; margin-bottom: 15px;">
-            <button type="button" id="findMyLocationBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none; padding: 10px 20px; border-radius: 25px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(255,107,53,0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
-              <i class="fa fa-map-marker-alt me-2"></i> Tìm vị trí của tôi
-            </button>
-            <div id="locationStatus" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; color: #28a745; font-weight: 500;">
-              <i class="fa fa-check-circle me-2"></i> <span id="locationText"></span>
-            </div>
-          </div>
-          <div id="map" style="position: relative;">
-            <iframe id="mapFrame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12469.776493332698!2d-80.14036379941481!3d25.907788681148624!2m3!1f357.26927939317244!2f20.870722720054623!3f0!3m2!1i1024!2i768!4f35!3m3!1m2!1s0x88d9add4b4ac788f%3A0xe77469d09480fcdb!2sSunny%20Isles%20Beach!5e1!3m2!1sen!2sth!4v1642869952544!5m2!1sen!2sth" width="100%" height="500px" frameborder="0" style="border:0; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);" allowfullscreen=""></iframe>
-          </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="item phone">
-                <img src="~/assets/images/phone-icon.png" alt="" style="max-width: 52px;">
-                <h6>010-020-0340<br><span>Phone Number</span></h6>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="item email">
-                <img src="~/assets/images/email-icon.png" alt="" style="max-width: 52px;">
-                <h6>info@matong.com<br><span>Email liên hệ</span></h6>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
           <form id="contact-form" action="@Url.Action("SendMessage", "Contact")" method="post">
             @Html.AntiForgeryToken()
             @if (TempData["SuccessMessage"] != null)
@@ -622,6 +595,39 @@
               </div>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 60px;">
+        <div class="col-lg-12">
+          <div style="position: relative; margin-bottom: 20px; text-align: center;">
+            <button type="button" id="findMyLocationBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none; padding: 10px 24px; border-radius: 25px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(255,107,53,0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)';">
+              <i class="fa fa-map-marker-alt me-2"></i> Tìm vị trí của tôi
+            </button>
+            <div id="locationStatus" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; color: #28a745; font-weight: 500; max-width: 600px; margin-left: auto; margin-right: auto;">
+              <i class="fa fa-check-circle me-2"></i> <span id="locationText"></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-12">
+          <div id="map" style="position: relative; margin-bottom: 30px;">
+            <iframe id="mapFrame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12469.776493332698!2d-80.14036379941481!3d25.907788681148624!2m3!1f357.26927939317244!2f20.870722720054623!3f0!3m2!1i1024!2i768!4f35!3m3!1m2!1s0x88d9add4b4ac788f%3A0xe77469d09480fcdb!2sSunny%20Isles%20Beach!5e1!3m2!1sen!2sth!4v1642869952544!5m2!1sen!2sth" width="100%" height="450px" frameborder="0" style="border:0; border-radius: 50px 50px 0 0; box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);" allowfullscreen=""></iframe>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 20px;">
+        <div class="col-lg-6">
+          <div class="item phone">
+            <img src="~/assets/images/phone-icon.png" alt="" style="max-width: 52px;">
+            <h6>010-020-0340<br><span>Phone Number</span></h6>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="item email">
+            <img src="~/assets/images/email-icon.png" alt="" style="max-width: 52px;">
+            <h6>info@matong.com<br><span>Email liên hệ</span></h6>
+          </div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@
     var totalItems = (int)(ViewData["TotalItems"] ?? 0);
     var pageSize = (int)(ViewData["PageSize"] ?? 5);
     var searchString = ViewData["SearchString"] as string;
+    var now = DateTime.Now;
 }
 
 <div class="container-fluid">
@@ -79,13 +80,23 @@
                                     </span>
                                 </td>
                                     <td>
-                                        @if (item.IsActive)
+                                        @if (!item.IsActive)
                                         {
-                                            <span class="badge bg-success">Hoạt động</span>
+                                            <span class="badge bg-danger">Đã khóa</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">Đã khóa</span>
+                                            var lastLogin = item.User?.LastLoginAt;
+                                            bool isOnline = lastLogin.HasValue && (now - lastLogin.Value).TotalMinutes < 10;
+
+                                            if (isOnline)
+                                            {
+                                                <span class="badge bg-success">Online</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Offline</span>
+                                            }
                                         }
                                     </td>
                                     <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>

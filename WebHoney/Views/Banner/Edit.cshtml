@@ -11,7 +11,6 @@
         <div class="card-body">
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="ImageUrl" />
                 <input type="hidden" asp-for="CreatedAt" />
                 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -48,12 +47,10 @@
                                 <strong class="text-muted">HOẶC</strong>
                             </div>
                             <div class="mb-3">
-                                <label for="imageUrlInput" class="form-label">Nhập URL hình ảnh</label>
-                                <input type="text" id="imageUrlInput" class="form-control" placeholder="https://example.com/image.jpg hoặc /images/banner.jpg" />
-                                <small class="form-text text-muted">Nhập đường dẫn URL của hình ảnh. Nếu nhập URL, ảnh upload sẽ bị bỏ qua.</small>
-                                <button type="button" id="previewUrlBtn" class="btn btn-sm btn-info mt-2">
-                                    <i class="fa fa-eye"></i> Xem trước URL
-                                </button>
+                                <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                                <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg hoặc /assets/images/banner-01.jpg" />
+                                <small class="form-text text-muted">Nhập đường dẫn URL của hình ảnh. Nếu nhập URL, ảnh upload sẽ được ưu tiên so với file upload.</small>
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -119,37 +116,21 @@
             }
         });
 
-        // Preview ảnh từ URL
-        document.getElementById('previewUrlBtn').addEventListener('click', function() {
-            const url = document.getElementById('imageUrlInput').value.trim();
-            if (url) {
+        // Preview ảnh từ URL (dựa trên ô ImageUrl)
+        const imageUrlInput = document.getElementById('ImageUrl');
+        if (imageUrlInput) {
+            imageUrlInput.addEventListener('change', function() {
+                const url = imageUrlInput.value.trim();
+                if (!url) return;
+
                 const preview = document.getElementById('previewImg');
                 const previewDiv = document.getElementById('imagePreview');
                 if (preview && previewDiv) {
                     preview.src = url;
                     previewDiv.style.display = 'block';
-                    preview.onerror = function() {
-                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
-                    };
                 }
-            } else {
-                alert('Vui lòng nhập URL hình ảnh.');
-            }
-        });
-
-        // Khi form submit, nếu có URL thì thêm vào form
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const urlInput = document.getElementById('imageUrlInput');
-            const url = urlInput ? urlInput.value.trim() : '';
-            if (url) {
-                // Tạo input hidden để gửi URL
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'imageUrl';
-                hiddenInput.value = url;
-                this.appendChild(hiddenInput);
-            }
-        });
+            });
+        }
     </script>
 }
 

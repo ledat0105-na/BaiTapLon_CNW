@@ -21,7 +21,7 @@
                 <div class="col-md-4">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;" />
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';" />
                     }
                     else
                     {

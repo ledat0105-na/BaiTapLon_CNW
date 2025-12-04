@@ -23,14 +23,14 @@ public class AdminController : Controller
         var today = DateTime.Today;
         var tomorrow = today.AddDays(1);
 
-        // Số đơn hàng hôm nay (dùng CreatedAt thay vì OrderDate)
-        var ordersToday = _context.Orders
-            .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
-            .Count();
+        // Đơn hàng hoàn thành hôm nay
+        var completedToday = _context.Orders
+            .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow && o.Status == "COMPLETED");
 
-        // Doanh thu hôm nay
-        var revenueToday = _context.Orders
-            .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+        var ordersToday = completedToday.Count();
+
+        // Doanh thu hôm nay (chỉ tính đơn COMPLETED)
+        var revenueToday = completedToday
             .Sum(o => (decimal?)o.TotalAmount) ?? 0;
 
         // Sản phẩm sắp hết (stock <= 10)
@@ -40,22 +40,62 @@ public class AdminController : Controller
             .OrderBy(p => p.Stock)
             .ToList();
 
-        // Tổng số đơn hàng đang xử lý (dùng PENDING, PROCESSING)
+        // Tổng số đơn hàng đang xử lý (PENDING, PROCESSING)
         var pendingOrders = _context.Orders
             .Where(o => o.Status == "PENDING" || o.Status == "PROCESSING")
             .Count();
 
-        // Tổng doanh thu tháng này
+        // Tổng doanh thu tháng này (chỉ tính COMPLETED)
         var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
-        var revenueThisMonth = _context.Orders
-            .Where(o => o.CreatedAt >= firstDayOfMonth && o.CreatedAt < tomorrow)
+        var completedThisMonth = _context.Orders
+            .Where(o => o.CreatedAt >= firstDayOfMonth && o.CreatedAt < tomorrow && o.Status == "COMPLETED");
+
+        var revenueThisMonth = completedThisMonth
             .Sum(o => (decimal?)o.TotalAmount) ?? 0;
+
+        // Một số thống kê tổng quan
+        var totalOrders = _context.Orders.Count();
+        var totalCustomers = _context.Customers.Count();
+        var totalProducts = _context.Products.Count(p => p.IsActive);
+
+        // Đơn đang giao (SHIPPING)
+        var shippingOrders = _context.Orders
+            .Where(o => o.Status == "SHIPPING")
+            .Count();
+
+        // Đơn bị hủy (CANCELED)
+        var canceledOrders = _context.Orders
+            .Where(o => o.Status == "CANCELED")
+            .Count();
+
+        // Top sản phẩm bán chạy (theo số lượng trong các đơn COMPLETED)
+        var topProducts = _context.OrderDetails
+            .Include(od => od.Product)
+            .Include(od => od.Order)
+            .Where(od => od.Order.Status == "COMPLETED")
+            .GroupBy(od => new { od.ProductId, od.ProductName })
+            .Select(g => new TopProductViewModel
+            {
+                ProductId = g.Key.ProductId,
+                ProductName = g.Key.ProductName,
+                TotalQuantity = g.Sum(x => x.Quantity),
+                TotalRevenue = g.Sum(x => x.LineTotal)
+            })
+            .OrderByDescending(tp => tp.TotalQuantity)
+            .Take(10)
+            .ToList();
 
         ViewData["OrdersToday"] = ordersToday;
         ViewData["RevenueToday"] = revenueToday;
         ViewData["LowStockProducts"] = lowStockProducts;
         ViewData["PendingOrders"] = pendingOrders;
         ViewData["RevenueThisMonth"] = revenueThisMonth;
+        ViewData["TotalOrders"] = totalOrders;
+        ViewData["TotalCustomers"] = totalCustomers;
+        ViewData["TotalProducts"] = totalProducts;
+        ViewData["ShippingOrders"] = shippingOrders;
+        ViewData["CanceledOrders"] = canceledOrders;
+        ViewData["TopProducts"] = topProducts;
 
         return View();
     }

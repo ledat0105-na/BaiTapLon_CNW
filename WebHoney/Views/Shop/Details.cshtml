@@ -25,7 +25,7 @@
             <!-- Product Images -->
             <div class="col-lg-6">
                 <div class="product-image">
-                    <img src="@(Model.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@Model.Name" class="img-fluid" style="width: 100%; max-height: 500px; object-fit: contain;">
+                    <img src="@(Model.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@Model.Name" class="img-fluid" style="width: 100%; max-height: 500px; object-fit: contain;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
                 </div>
             </div>
 
@@ -95,19 +95,23 @@
 
                     @if (Model.Stock > 0)
                     {
-                        <div class="add-to-cart mb-4">
-                            <div class="row">
-                                <div class="col-4">
-                                    <label>Số lượng:</label>
-                                    <input type="number" id="quantity" class="form-control" value="1" min="1" max="@Model.Stock">
-                                </div>
-                                <div class="col-8 d-flex align-items-end">
-                                    <button type="button" class="btn btn-primary w-100" onclick="addToCart(@Model.Id)">
-                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
-                                    </button>
+                        <form id="cartForm">
+                            @Html.AntiForgeryToken()
+
+                            <div class="add-to-cart mb-4">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label>Số lượng:</label>
+                                        <input type="number" id="quantity" class="form-control" value="1" min="1" max="@Model.Stock">
+                                    </div>
+                                    <div class="col-8 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary w-100" onclick="addToCart(@Model.Id)">
+                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     }
                     else
                     {
@@ -150,7 +154,7 @@
                             <div class="col-lg-3 col-md-4 mb-4">
                                 <div class="item">
                                     <a href="@Url.Action("Details", "Shop", new { id = related.Id })">
-                                        <img src="@(related.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@related.Name" style="width: 100%; height: 200px; object-fit: cover;">
+                                        <img src="@(related.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@related.Name" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
                                     </a>
                                     <span class="category">@related.Category?.Name</span>
                                     <h6><a href="@Url.Action("Details", "Shop", new { id = related.Id })">@related.Name</a></h6>
@@ -171,24 +175,28 @@
 @section Scripts {
     <script>
         function addToCart(productId) {
-            const quantity = document.getElementById('quantity').value;
-            
+            const quantityInput = document.getElementById('quantity');
+            const form = document.getElementById('cartForm');
+            const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+
+            const quantity = parseInt(quantityInput?.value || '0');
+            const token = tokenInput?.value || '';
+
             fetch('/Cart/Add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    'RequestVerificationToken': token
                 },
                 body: JSON.stringify({
                     productId: productId,
-                    quantity: parseInt(quantity)
+                    quantity: quantity
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     alert('Đã thêm sản phẩm vào giỏ hàng!');
-                    // Có thể cập nhật số lượng sản phẩm trong giỏ hàng ở header
                     if (typeof updateCartCount === 'function') {
                         updateCartCount();
                     }

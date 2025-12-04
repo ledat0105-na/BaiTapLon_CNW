@@ -219,6 +219,17 @@ CREATE TABLE featured_products (
     INDEX idx_display_order (display_order),
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+--Bang Gio hang Cho khach hang
+CREATE TABLE `user_cart_items` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `quantity` INT NOT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL
+);
+ALTER TABLE users
+ADD COLUMN last_login_at DATETIME NULL AFTER updated_at;
 
 -- ============================================
 -- INSERT DỮ LIỆU MẪU

@@ -12,6 +12,14 @@ public class Order
     
     [Column("customer_id")]
     public long? CustomerId { get; set; }
+
+    [Column("user_id")]
+    public long? UserId { get; set; }
+
+    [Required]
+    [Column("full_name")]
+    [StringLength(150)]
+    public string FullName { get; set; } = string.Empty;
     
     [Required]
     [Column("total_amount", TypeName = "decimal(15,2)")]
