@@ -70,6 +70,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Cho phép serve static files từ wwwroot
 app.UseRouting();
 
 // Sử dụng Session (phải đặt trước UseAuthorization)

@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="~/assets/css/owl.css">
     <link rel="stylesheet" href="~/assets/css/animate.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 
 <body>
@@ -87,7 +88,7 @@
                       @if (!string.IsNullOrEmpty(userId))
                       {
                           <li>
-                              <a href="#">
+                              <a asp-controller="Account" asp-action="Profile">
                                   <i class="fa fa-user"></i> @(string.IsNullOrEmpty(fullName) ? username : fullName)
                                   @if (role == "ADMIN" || role == "Admin")
                                   {
@@ -123,12 +124,56 @@
     @RenderBody()
   </main>
 
-  <footer>
-    <div class="container">
-      <div class="col-lg-8">
-        <p>Copyright © 2025 Web bán mật ong. All rights reserved. 
-        
-        Design: <a rel="nofollow" href="https://templatemo.com" target="_blank">TemplateMo</a></p>
+  <footer class="honey-footer mt-5">
+    <div class="container py-5">
+      <div class="row gy-4">
+        <!-- Cột 1: Logo + mô tả ngắn -->
+        <div class="col-lg-4 col-md-6">
+          <div class="honey-footer-logo mb-3">
+            <h3 class="mb-0">Mật Ong</h3>
+          </div>
+          <p class="honey-footer-text mb-3">
+            Mật ong thiên nhiên nguyên chất, được tuyển chọn kỹ lưỡng từ các vùng nguyên liệu sạch trên khắp Việt Nam.
+          </p>
+          <p class="honey-footer-text small mb-0">
+            © 2025 Web bán mật ong. All rights reserved.
+          </p>
+        </div>
+
+        <!-- Cột 2: Menu nhanh -->
+        <div class="col-lg-4 col-md-6">
+          <h5 class="honey-footer-title mb-3">Menu nhanh</h5>
+          <ul class="list-unstyled honey-footer-links">
+            <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li><a asp-controller="Shop" asp-action="Index">Sản phẩm</a></li>
+            <li><a asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+            <li><a asp-controller="Home" asp-action="Index">Giới thiệu</a></li>
+          </ul>
+        </div>
+
+        <!-- Cột 3: Thông tin liên hệ -->
+        <div class="col-lg-4 col-md-12">
+          <h5 class="honey-footer-title mb-3">Liên hệ</h5>
+          <ul class="list-unstyled honey-footer-contact">
+            <li>
+              <i class="fa fa-map-marker-alt me-2"></i>
+              <span>Sunny Isles Beach, FL 33160</span>
+            </li>
+            <li>
+              <i class="fa fa-envelope me-2"></i>
+              <span>info@matong.com</span>
+            </li>
+            <li>
+              <i class="fa fa-phone me-2"></i>
+              <span>0123 456 789</span>
+            </li>
+          </ul>
+          <div class="honey-footer-social mt-3">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
       </div>
     </div>
   </footer>

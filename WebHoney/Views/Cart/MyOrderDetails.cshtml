@@ -1,0 +1,83 @@
+@model WebHoney.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a> / <a asp-controller="Cart" asp-action="MyOrders">Đơn hàng của tôi</a> / Chi tiết</span>
+                <h3>Chi tiết đơn hàng #@Model.Id</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section best-deal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Thông tin đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Trạng thái:</strong> @Model.Status</p>
+                        <p><strong>Ngày tạo:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("#,##0") VNĐ</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Sản phẩm</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td class="text-center">@item.Quantity</td>
+                                        <td class="text-end">@item.UnitPrice.ToString("#,##0") VNĐ</td>
+                                        <td class="text-end">@item.LineTotal.ToString("#,##0") VNĐ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Thông tin giao hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Họ và tên:</strong> @Model.FullName</p>
+                        <p><strong>Số điện thoại:</strong> @Model.Phone</p>
+                        <p><strong>Địa chỉ:</strong><br />@Model.ShippingAddress</p>
+                    </div>
+                </div>
+
+                <a asp-controller="Cart" asp-action="MyOrders" class="btn btn-outline-secondary w-100 mb-2">
+                    Quay lại danh sách đơn hàng
+                </a>
+                <a asp-controller="Shop" asp-action="Index" class="btn btn-primary w-100">
+                    Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

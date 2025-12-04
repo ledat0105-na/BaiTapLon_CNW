@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebHoney.Data;
 using WebHoney.Models;
+using WebHoney.Extensions;
 using WebHoney.Services;
+using WebHoney.Extensions;
 using WebHoney.ViewModels;
 using AuthService = WebHoney.Services.IAuthenticationService;
 
@@ -14,13 +16,15 @@ public class AccountController : Controller
     private readonly ApplicationDbContext _context;
     private readonly ILogger<AccountController> _logger;
     private readonly IConfiguration _configuration;
+    private readonly ICartService _cartService;
 
-    public AccountController(AuthService authService, ApplicationDbContext context, ILogger<AccountController> logger, IConfiguration configuration)
+    public AccountController(AuthService authService, ApplicationDbContext context, ILogger<AccountController> logger, IConfiguration configuration, ICartService cartService)
     {
         _authService = authService;
         _context = context;
         _logger = logger;
         _configuration = configuration;
+        _cartService = cartService;
     }
 
     // GET: Account/Register
@@ -125,7 +129,35 @@ public class AccountController : Controller
             HttpContext.Session.SetString("RememberMe", "true");
         }
 
+        // Cập nhật thời điểm đăng nhập gần nhất
+        var userEntity = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.UserId);
+        if (userEntity != null)
+        {
+            userEntity.LastLoginAt = DateTime.Now;
+            userEntity.UpdatedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+        }
+
         _logger.LogInformation($"User {user.Username} logged in successfully");
+
+        // Mỗi lần đăng nhập: luôn thay thế giỏ hàng trong Session bằng giỏ hàng đã lưu trong DB
+        // -> tránh cộng dồn số lượng khi trước đó đã có giỏ hàng guest hoặc do các lần login trước.
+        _cartService.ClearCart(HttpContext.Session);
+
+        var savedCartItems = await _context.UserCartItems
+            .Where(ci => ci.UserId == user.UserId)
+            .ToListAsync();
+
+        foreach (var item in savedCartItems)
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == item.ProductId && p.IsActive && p.Stock > 0);
+
+            if (product != null && item.Quantity > 0)
+            {
+                _cartService.AddToCart(HttpContext.Session, item.ProductId, item.Quantity, product);
+            }
+        }
 
         // Redirect về trang đã yêu cầu nếu có
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -143,10 +175,78 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    // GET: Account/Logout
-    public IActionResult Logout()
+    // GET: Account/Profile - Trang cá nhân khách hàng
+    [HttpGet]
+    public async Task<IActionResult> Profile()
     {
-        HttpContext.Session.Clear();
+        var userId = HttpContext.Session.GetUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", new { returnUrl = Url.Action("Profile", "Account") });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+        if (user == null)
+        {
+            // Nếu user không tồn tại nữa thì cho đăng xuất
+            return RedirectToAction("Logout");
+        }
+
+        var orders = await _context.Orders
+            .Where(o => o.UserId == userId.Value)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        var vm = new AccountProfileViewModel
+        {
+            User = user,
+            Orders = orders
+        };
+
+        return View(vm);
+    }
+
+    // GET: Account/Logout
+    public async Task<IActionResult> Logout()
+    {
+        var userId = HttpContext.Session.GetUserId();
+
+        // Lưu giỏ hàng hiện tại xuống database gắn với tài khoản
+        if (userId.HasValue)
+        {
+            var cart = _cartService.GetCart(HttpContext.Session);
+
+            // Xóa các item cũ của user trong DB
+            var existingItems = _context.UserCartItems.Where(ci => ci.UserId == userId.Value);
+            _context.UserCartItems.RemoveRange(existingItems);
+
+            // Thêm lại theo giỏ hiện tại
+            foreach (var item in cart.Values)
+            {
+                if (item.Quantity <= 0) continue;
+
+                _context.UserCartItems.Add(new UserCartItem
+                {
+                    UserId = userId.Value,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        // Xóa thông tin đăng nhập và giỏ hàng trong Session
+        HttpContext.Session.Remove("UserId");
+        HttpContext.Session.Remove("Username");
+        HttpContext.Session.Remove("Email");
+        HttpContext.Session.Remove("FullName");
+        HttpContext.Session.Remove("Role");
+        HttpContext.Session.Remove("RememberMe");
+        HttpContext.Session.Remove("Cart");
+
         TempData["SuccessMessage"] = "Đăng xuất thành công!";
         return RedirectToAction("Index", "Home");
     }

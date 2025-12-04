@@ -77,7 +77,7 @@
                             <div class="col-lg-4 col-md-6 mb-4">
                                 <div class="item">
                                     <a href="@Url.Action("Details", "Shop", new { id = product.Id })">
-                                        <img src="@(product.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@product.Name" style="width: 100%; height: 250px; object-fit: cover;">
+                                        <img src="@(product.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@product.Name" style="width: 100%; height: 250px; object-fit: cover;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
                                     </a>
                                     <span class="category">@product.Category?.Name</span>
                                     <h6><a href="@Url.Action("Details", "Shop", new { id = product.Id })">@product.Name</a></h6>
@@ -94,52 +94,14 @@
                         }
                     </div>
 
-                    <!-- Pagination -->
-                    @if (totalPages > 1)
-                    {
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                @if (page > 1)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=@(page - 1)&search=@search&categoryId=@categoryId&sortBy=@sortBy">Trước</a>
-                                    </li>
-                                }
-                                
-                                @for (int i = 1; i <= totalPages; i++)
-                                {
-                                    if (i == page)
-                                    {
-                                        <li class="page-item active">
-                                            <span class="page-link">@i</span>
-                                        </li>
-                                    }
-                                    else if (i == 1 || i == totalPages || (i >= page - 2 && i <= page + 2))
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=@i&search=@search&categoryId=@categoryId&sortBy=@sortBy">@i</a>
-                                        </li>
-                                    }
-                                    else if (i == page - 3 || i == page + 3)
-                                    {
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    }
-                                }
-                                
-                                @if (page < totalPages)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=@(page + 1)&search=@search&categoryId=@categoryId&sortBy=@sortBy">Sau</a>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-                    }
-
-                    <div class="text-center mt-3">
-                        <p>Hiển thị @((page - 1) * pageSize + 1) - @(Math.Min(page * pageSize, totalItems)) trong tổng số @totalItems sản phẩm</p>
+                    <!-- Pagination Info -->
+                    <div class="row mt-4 mb-3">
+                        <div class="col-12 text-center">
+                            <p class="text-muted mb-0">
+                                Hiển thị <strong>@((page - 1) * pageSize + 1)</strong> - <strong>@(Math.Min(page * pageSize, totalItems))</strong> 
+                                trong tổng số <strong>@totalItems</strong> sản phẩm
+                            </p>
+                        </div>
                     </div>
                 }
                 else

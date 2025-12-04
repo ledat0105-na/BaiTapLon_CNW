@@ -1,0 +1,87 @@
+@model List<WebHoney.Models.CartItem>
+@{
+    ViewData["Title"] = "Thanh toán";
+    var cartTotal = (decimal)ViewData["CartTotal"]!;
+}
+
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a> / <a asp-controller="Cart" asp-action="Index">Giỏ hàng</a> / Thanh toán</span>
+                <h3>Thanh toán đơn hàng</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section best-deal">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h4>Thông tin sản phẩm</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                                <td>@item.Price.ToString("#,##0") VNĐ</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Total.ToString("#,##0") VNĐ</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                            <td><strong>@cartTotal.ToString("#,##0") VNĐ</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Thông tin khách hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="CheckoutConfirm" asp-controller="Cart" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" name="CustomerName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" name="Phone" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Địa chỉ giao hàng</label>
+                                <textarea class="form-control" name="Address" rows="3" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fa fa-check"></i> Xác nhận đặt hàng
+                            </button>
+
+                            <a asp-action="Index" asp-controller="Cart" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="fa fa-arrow-left"></i> Quay lại giỏ hàng
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
