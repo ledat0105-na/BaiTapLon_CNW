@@ -169,35 +169,10 @@ public class BannerController : Controller
             var existingBanner = await _context.BannerImages.FindAsync(id);
             if (existingBanner == null) return NotFound();
 
-            // Ưu tiên URL nếu có, sau đó mới đến file upload
-            var newImageUrl = banner.ImageUrl?.Trim();
-            if (!string.IsNullOrWhiteSpace(newImageUrl))
-            {
-                // Chỉ cập nhật nếu URL thay đổi
-                if (existingBanner.ImageUrl != newImageUrl)
-                {
-                    // Xóa file cũ nếu là file local
-                    if (!string.IsNullOrEmpty(existingBanner.ImageUrl) && existingBanner.ImageUrl.StartsWith("/uploads/"))
-                    {
-                        var oldFilePath = Path.Combine(_env.WebRootPath, existingBanner.ImageUrl.TrimStart('/'));
-                        if (System.IO.File.Exists(oldFilePath))
-                        {
-                            try
-                            {
-                                System.IO.File.Delete(oldFilePath);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Không thể xóa file cũ: {FilePath}", oldFilePath);
-                            }
-                        }
-                    }
-                    existingBanner.ImageUrl = newImageUrl;
-                    existingBanner.UpdatedAt = DateTime.Now; // Cập nhật timestamp khi đổi ảnh
-                }
-            }
-            // Nếu có file mới được upload (và không có URL)
-            else if (imageFile != null && imageFile.Length > 0)
+            var imageChanged = false;
+
+            // Ưu tiên file upload nếu có (file upload có độ ưu tiên cao hơn URL)
+            if (imageFile != null && imageFile.Length > 0)
             {
                 // Kiểm tra định dạng
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
@@ -248,9 +223,38 @@ public class BannerController : Controller
                 }
 
                 existingBanner.ImageUrl = $"/uploads/banners/{fileName}";
-                existingBanner.UpdatedAt = DateTime.Now; // Cập nhật timestamp khi upload file mới
+                imageChanged = true;
             }
-            // Nếu không có file upload và không có URL, giữ nguyên ImageUrl hiện tại
+            // Nếu không có file upload, kiểm tra URL từ form
+            else
+            {
+                var newImageUrl = banner.ImageUrl?.Trim();
+                if (!string.IsNullOrWhiteSpace(newImageUrl))
+                {
+                    // Chỉ cập nhật nếu URL thay đổi
+                    if (existingBanner.ImageUrl != newImageUrl)
+                    {
+                        // Xóa file cũ nếu là file local
+                        if (!string.IsNullOrEmpty(existingBanner.ImageUrl) && existingBanner.ImageUrl.StartsWith("/uploads/"))
+                        {
+                            var oldFilePath = Path.Combine(_env.WebRootPath, existingBanner.ImageUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                try
+                                {
+                                    System.IO.File.Delete(oldFilePath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex, "Không thể xóa file cũ: {FilePath}", oldFilePath);
+                                }
+                            }
+                        }
+                        existingBanner.ImageUrl = newImageUrl;
+                        imageChanged = true;
+                    }
+                }
+            }
 
             // Cập nhật các thông tin khác
             var hasChanges = existingBanner.Title != banner.Title ||
@@ -263,8 +267,8 @@ public class BannerController : Controller
             existingBanner.DisplayOrder = banner.DisplayOrder;
             existingBanner.IsActive = banner.IsActive;
             
-            // Chỉ cập nhật UpdatedAt nếu có thay đổi hoặc chưa được cập nhật ở trên
-            if (hasChanges && existingBanner.UpdatedAt == null)
+            // Luôn cập nhật UpdatedAt nếu có thay đổi ảnh hoặc thông tin khác
+            if (imageChanged || hasChanges)
             {
                 existingBanner.UpdatedAt = DateTime.Now;
             }

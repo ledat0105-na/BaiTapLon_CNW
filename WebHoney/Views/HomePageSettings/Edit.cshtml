@@ -3,6 +3,17 @@
     ViewData["Title"] = "Cài đặt trang chủ";
 }
 
+<style>
+    .validation-summary-valid {
+        display: none !important;
+    }
+    
+    .validation-summary-errors ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -22,6 +33,10 @@
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="Id" />
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        }
 
                         <div class="row">
                             <div class="col-md-6">
@@ -40,12 +55,22 @@
                                     <div class="mb-3">
                                         <label for="imageFile" class="form-label">Upload ảnh mới:</label>
                                         <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" onchange="previewImage(this)">
-                                        <small class="form-text text-muted">Chọn file ảnh để upload (JPG, PNG, GIF)</small>
+                                        <small class="form-text text-muted">Chọn file ảnh để upload (JPG, PNG, GIF, WEBP). Kích thước tối đa: 5MB</small>
+                                        @if (ViewData.ModelState["ImageFile"]?.Errors?.Count > 0)
+                                        {
+                                            <span class="text-danger">@ViewData.ModelState["ImageFile"].Errors[0].ErrorMessage</span>
+                                        }
+                                    </div>
+                                    <div class="text-center my-2">
+                                        <strong class="text-muted">HOẶC</strong>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="imageUrl" class="form-label">Hoặc nhập URL ảnh:</label>
-                                        <input type="url" name="imageUrl" id="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" value="@Model.FeaturedImageUrl">
+                                        <label for="imageUrl" class="form-label">Nhập URL ảnh:</label>
+                                        <input type="text" name="imageUrl" id="imageUrl" class="form-control" placeholder="https://example.com/image.jpg hoặc /images/product.jpg" value="@Model.FeaturedImageUrl">
                                         <small class="form-text text-muted">Nhập đường dẫn URL của ảnh (nếu không upload file)</small>
+                                        <button type="button" id="previewUrlBtn" class="btn btn-sm btn-info mt-2">
+                                            <i class="fa fa-eye"></i> Xem trước URL
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -57,6 +82,234 @@
                                         <li>Kích thước khuyến nghị: 600x400px hoặc tỷ lệ tương tự</li>
                                         <li>Bạn có thể upload file hoặc nhập URL ảnh</li>
                                         <li>Nếu upload file, ảnh sẽ được lưu trong thư mục uploads/homepage</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Phần quản lý sản phẩm bán chạy -->
+                        <h4 class="mb-3"><i class="fa fa-fire me-2" style="color: #ff6b35;"></i> Sản Phẩm Bán Chạy Nhất</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bestSellerProductId" class="form-label">Chọn sản phẩm (tùy chọn)</label>
+                                    <select name="bestSellerProductId" id="bestSellerProductId" class="form-select">
+                                        <option value="">-- Không chọn sản phẩm --</option>
+                                        @if (ViewBag.Products != null)
+                                        {
+                                            @foreach (var product in ViewBag.Products as Microsoft.AspNetCore.Mvc.Rendering.SelectList ?? new Microsoft.AspNetCore.Mvc.Rendering.SelectList(new List<object>()))
+                                            {
+                                                <option value="@product.Value" selected="@(Model.BestSellerProductId != null && Model.BestSellerProductId.ToString() == product.Value)">@product.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Nếu chọn sản phẩm, thông tin sản phẩm sẽ được hiển thị tự động</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bestSellerTitle" class="form-label">Tiêu đề sản phẩm</label>
+                                    <input type="text" name="bestSellerTitle" id="bestSellerTitle" class="form-control" value="@Model.BestSellerTitle" placeholder="Ví dụ: Mật Ong Hoa Nhãn">
+                                    <small class="form-text text-muted">Tiêu đề hiển thị cho sản phẩm bán chạy</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bestSellerDescription" class="form-label">Mô tả sản phẩm</label>
+                                    <textarea name="bestSellerDescription" id="bestSellerDescription" class="form-control" rows="4" placeholder="Mô tả về sản phẩm bán chạy">@Model.BestSellerDescription</textarea>
+                                    <small class="form-text text-muted">Mô tả ngắn về sản phẩm</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh sản phẩm bán chạy</label>
+                                    <div class="mb-2">
+                                        @if (!string.IsNullOrEmpty(Model.BestSellerImageUrl))
+                                        {
+                                            <img src="@Model.BestSellerImageUrl" alt="Ảnh sản phẩm bán chạy" id="bestSellerPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" onerror="this.src='/assets/images/deal-01.jpg'; this.onerror=null;">
+                                        }
+                                        else
+                                        {
+                                            <img src="/assets/images/deal-01.jpg" alt="Ảnh mặc định" id="bestSellerPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;">
+                                        }
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="bestSellerImageFile" class="form-label">Upload ảnh mới:</label>
+                                        <input type="file" name="bestSellerImageFile" id="bestSellerImageFile" class="form-control" accept="image/*" onchange="previewBestSellerImage(this)">
+                                        <small class="form-text text-muted">Chọn file ảnh để upload (JPG, PNG, GIF, WEBP). Kích thước tối đa: 5MB</small>
+                                    </div>
+                                    <div class="text-center my-2">
+                                        <strong class="text-muted">HOẶC</strong>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="bestSellerImageUrl" class="form-label">Nhập URL ảnh:</label>
+                                        <input type="text" name="bestSellerImageUrl" id="bestSellerImageUrl" class="form-control" placeholder="https://example.com/image.jpg hoặc /images/product.jpg" value="@Model.BestSellerImageUrl">
+                                        <small class="form-text text-muted">Nhập đường dẫn URL của ảnh (nếu không upload file)</small>
+                                        <button type="button" id="previewBestSellerUrlBtn" class="btn btn-sm btn-info mt-2">
+                                            <i class="fa fa-eye"></i> Xem trước URL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Phần quản lý sản phẩm mới -->
+                        <h4 class="mb-3"><i class="fa fa-star me-2" style="color: #ff6b35;"></i> Sản Phẩm Mới</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="newArrivalProductId" class="form-label">Chọn sản phẩm (tùy chọn)</label>
+                                    <select name="newArrivalProductId" id="newArrivalProductId" class="form-select">
+                                        <option value="">-- Không chọn sản phẩm --</option>
+                                        @if (ViewBag.Products != null)
+                                        {
+                                            @foreach (var product in ViewBag.Products as Microsoft.AspNetCore.Mvc.Rendering.SelectList ?? new Microsoft.AspNetCore.Mvc.Rendering.SelectList(new List<object>()))
+                                            {
+                                                <option value="@product.Value" selected="@(Model.NewArrivalProductId != null && Model.NewArrivalProductId.ToString() == product.Value)">@product.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newArrivalTitle" class="form-label">Tiêu đề sản phẩm</label>
+                                    <input type="text" name="newArrivalTitle" id="newArrivalTitle" class="form-control" value="@Model.NewArrivalTitle" placeholder="Ví dụ: Mật Ong Rừng">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newArrivalDescription" class="form-label">Mô tả sản phẩm</label>
+                                    <textarea name="newArrivalDescription" id="newArrivalDescription" class="form-control" rows="4" placeholder="Mô tả về sản phẩm mới">@Model.NewArrivalDescription</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh sản phẩm mới</label>
+                                    <div class="mb-2">
+                                        @if (!string.IsNullOrEmpty(Model.NewArrivalImageUrl))
+                                        {
+                                            <img src="@Model.NewArrivalImageUrl" alt="Ảnh sản phẩm mới" id="newArrivalPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" onerror="this.src='/assets/images/deal-02.jpg'; this.onerror=null;">
+                                        }
+                                        else
+                                        {
+                                            <img src="/assets/images/deal-02.jpg" alt="Ảnh mặc định" id="newArrivalPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;">
+                                        }
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newArrivalImageFile" class="form-label">Upload ảnh mới:</label>
+                                        <input type="file" name="newArrivalImageFile" id="newArrivalImageFile" class="form-control" accept="image/*" onchange="previewNewArrivalImage(this)">
+                                    </div>
+                                    <div class="text-center my-2"><strong class="text-muted">HOẶC</strong></div>
+                                    <div class="mb-3">
+                                        <label for="newArrivalImageUrl" class="form-label">Nhập URL ảnh:</label>
+                                        <input type="text" name="newArrivalImageUrl" id="newArrivalImageUrl" class="form-control" placeholder="https://example.com/image.jpg" value="@Model.NewArrivalImageUrl">
+                                        <button type="button" id="previewNewArrivalUrlBtn" class="btn btn-sm btn-info mt-2">
+                                            <i class="fa fa-eye"></i> Xem trước URL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Phần quản lý khuyến mãi -->
+                        <h4 class="mb-3"><i class="fa fa-gift me-2" style="color: #ff6b35;"></i> Khuyến Mãi</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="specialOfferProductId" class="form-label">Chọn sản phẩm (tùy chọn)</label>
+                                    <select name="specialOfferProductId" id="specialOfferProductId" class="form-select">
+                                        <option value="">-- Không chọn sản phẩm --</option>
+                                        @if (ViewBag.Products != null)
+                                        {
+                                            @foreach (var product in ViewBag.Products as Microsoft.AspNetCore.Mvc.Rendering.SelectList ?? new Microsoft.AspNetCore.Mvc.Rendering.SelectList(new List<object>()))
+                                            {
+                                                <option value="@product.Value" selected="@(Model.SpecialOfferProductId != null && Model.SpecialOfferProductId.ToString() == product.Value)">@product.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="specialOfferTitle" class="form-label">Tiêu đề sản phẩm</label>
+                                    <input type="text" name="specialOfferTitle" id="specialOfferTitle" class="form-control" value="@Model.SpecialOfferTitle" placeholder="Ví dụ: Combo Đặc Biệt">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="specialOfferDescription" class="form-label">Mô tả sản phẩm</label>
+                                    <textarea name="specialOfferDescription" id="specialOfferDescription" class="form-control" rows="4" placeholder="Mô tả về khuyến mãi">@Model.SpecialOfferDescription</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh khuyến mãi</label>
+                                    <div class="mb-2">
+                                        @if (!string.IsNullOrEmpty(Model.SpecialOfferImageUrl))
+                                        {
+                                            <img src="@Model.SpecialOfferImageUrl" alt="Ảnh khuyến mãi" id="specialOfferPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" onerror="this.src='/assets/images/deal-03.jpg'; this.onerror=null;">
+                                        }
+                                        else
+                                        {
+                                            <img src="/assets/images/deal-03.jpg" alt="Ảnh mặc định" id="specialOfferPreview" class="img-thumbnail" style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;">
+                                        }
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="specialOfferImageFile" class="form-label">Upload ảnh mới:</label>
+                                        <input type="file" name="specialOfferImageFile" id="specialOfferImageFile" class="form-control" accept="image/*" onchange="previewSpecialOfferImage(this)">
+                                    </div>
+                                    <div class="text-center my-2"><strong class="text-muted">HOẶC</strong></div>
+                                    <div class="mb-3">
+                                        <label for="specialOfferImageUrl" class="form-label">Nhập URL ảnh:</label>
+                                        <input type="text" name="specialOfferImageUrl" id="specialOfferImageUrl" class="form-control" placeholder="https://example.com/image.jpg" value="@Model.SpecialOfferImageUrl">
+                                        <button type="button" id="previewSpecialOfferUrlBtn" class="btn btn-sm btn-info mt-2">
+                                            <i class="fa fa-eye"></i> Xem trước URL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Phần cài đặt banner -->
+                        <h4 class="mb-3"><i class="fa fa-image me-2" style="color: #ff6b35;"></i> Cài Đặt Banner</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bannerSlideInterval" class="form-label">Thời gian chuyển ảnh banner (giây)</label>
+                                    <input type="number" name="bannerSlideInterval" id="bannerSlideInterval" class="form-control" 
+                                           value="@(Model.BannerSlideInterval > 0 ? (Model.BannerSlideInterval / 1000) : 0)" 
+                                           min="0" step="0.5" placeholder="Ví dụ: 5 (cho 5 giây)">
+                                    <small class="form-text text-muted">
+                                        Nhập số giây để tự động chuyển ảnh banner. 
+                                        <br />- Nhập <strong>0</strong> để tắt tự động chuyển (banner sẽ đứng yên)
+                                        <br />- Nhập <strong>5</strong> để chuyển mỗi 5 giây
+                                        <br />- Nhập <strong>10</strong> để chuyển mỗi 10 giây
+                                        <br />- Có thể nhập số thập phân như <strong>3.5</strong> (3.5 giây)
+                                    </small>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('bannerSlideInterval').value = '0'">
+                                            <i class="fa fa-pause"></i> Tắt tự động
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('bannerSlideInterval').value = '3'">
+                                            <i class="fa fa-clock"></i> 3 giây
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('bannerSlideInterval').value = '5'">
+                                            <i class="fa fa-clock"></i> 5 giây
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('bannerSlideInterval').value = '10'">
+                                            <i class="fa fa-clock"></i> 10 giây
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h5><i class="fa fa-info-circle"></i> Hướng dẫn</h5>
+                                    <ul class="mb-0">
+                                        <li>Thời gian chuyển ảnh được tính bằng <strong>giây</strong></li>
+                                        <li>Giá trị <strong>0</strong> = Banner đứng yên, không tự động chuyển</li>
+                                        <li>Giá trị <strong>3-5 giây</strong> = Phù hợp cho banner nhanh</li>
+                                        <li>Giá trị <strong>5-10 giây</strong> = Phù hợp cho banner thông thường</li>
+                                        <li>Giá trị <strong>10+ giây</strong> = Phù hợp cho banner chậm</li>
                                     </ul>
                                 </div>
                             </div>
@@ -77,18 +330,126 @@
     </div>
 </div>
 
-<script>
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var img = input.closest('.mb-3').querySelector('img');
-            if (img) {
-                img.src = e.target.result;
+@section Scripts {
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = input.closest('.mb-3').parentElement.querySelector('img');
+                    if (img) {
+                        img.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
             }
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
+        }
+
+        // Preview ảnh từ URL
+        document.getElementById('previewUrlBtn')?.addEventListener('click', function() {
+            const url = document.getElementById('imageUrl').value.trim();
+            if (url) {
+                const img = document.querySelector('.mb-2 img');
+                if (img) {
+                    img.src = url;
+                    img.onerror = function() {
+                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
+                    };
+                }
+            } else {
+                alert('Vui lòng nhập URL hình ảnh.');
+            }
+        });
+
+        // Preview ảnh sản phẩm bán chạy khi chọn file
+        function previewBestSellerImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('bestSellerPreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Preview ảnh sản phẩm bán chạy từ URL
+        document.getElementById('previewBestSellerUrlBtn')?.addEventListener('click', function() {
+            const url = document.getElementById('bestSellerImageUrl').value.trim();
+            if (url) {
+                const preview = document.getElementById('bestSellerPreview');
+                if (preview) {
+                    preview.src = url;
+                    preview.onerror = function() {
+                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
+                    };
+                }
+            } else {
+                alert('Vui lòng nhập URL hình ảnh.');
+            }
+        });
+
+        // Preview ảnh sản phẩm mới khi chọn file
+        function previewNewArrivalImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('newArrivalPreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Preview ảnh sản phẩm mới từ URL
+        document.getElementById('previewNewArrivalUrlBtn')?.addEventListener('click', function() {
+            const url = document.getElementById('newArrivalImageUrl').value.trim();
+            if (url) {
+                const preview = document.getElementById('newArrivalPreview');
+                if (preview) {
+                    preview.src = url;
+                    preview.onerror = function() {
+                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
+                    };
+                }
+            } else {
+                alert('Vui lòng nhập URL hình ảnh.');
+            }
+        });
+
+        // Preview ảnh khuyến mãi khi chọn file
+        function previewSpecialOfferImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('specialOfferPreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Preview ảnh khuyến mãi từ URL
+        document.getElementById('previewSpecialOfferUrlBtn')?.addEventListener('click', function() {
+            const url = document.getElementById('specialOfferImageUrl').value.trim();
+            if (url) {
+                const preview = document.getElementById('specialOfferPreview');
+                if (preview) {
+                    preview.src = url;
+                    preview.onerror = function() {
+                        alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại đường dẫn.');
+                    };
+                }
+            } else {
+                alert('Vui lòng nhập URL hình ảnh.');
+            }
+        });
+    </script>
 }
-</script>
 

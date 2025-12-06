@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<FeaturedProduct> FeaturedProducts { get; set; }
     public DbSet<ContactMessage> ContactMessages { get; set; }
     public DbSet<HomePageSettings> HomePageSettings { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

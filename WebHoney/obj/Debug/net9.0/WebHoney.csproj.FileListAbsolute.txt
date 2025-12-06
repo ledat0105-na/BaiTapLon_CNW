@@ -29,10 +29,8 @@ D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\j8e4
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\w4qg8bf6yk-c10bbavtrn.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\oymwnvstw7-0wqskg6u0e.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\rih3txxzld-80l8ykkc65.gz
-D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\vzprlb3odi-kenkt0rqdn.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\xg140l1a2t-fi4muoliu0.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\nijv1vn6ze-s0urs9j7h8.gz
-D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\szmaszg9t7-b9sayid5wm.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\ku34lwcv2n-61n19gt1b8.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\b0n00mm691-xtxxf3hu2r.gz
 D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\ce3dlgrpd5-t1cqhe9u97.gz
@@ -240,3 +238,8 @@ D:\CongNgheWed\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\WebHoney.pdb
 D:\CongNgheWed\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\WebHoney.genruntimeconfig.cache
 D:\CongNgheWed\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\ref\WebHoney.dll
 D:\CongNgheWed\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\szmaszg9t7-bbbe42912w.gz
+D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\szmaszg9t7-bbbe42912w.gz
+D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\vzprlb3odi-b5lpno9x9u.gz
+D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\t961hijjhj-b5lg4h51lu.gz
+D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\rbzzlr9eiv-81tx8fzw50.gz
+D:\DU LIEU\CONG NGHE WEB\BaiTapLon_CNW\WebHoney\obj\Debug\net9.0\compressed\7yktrw72h6-as75sx0xlq.gz

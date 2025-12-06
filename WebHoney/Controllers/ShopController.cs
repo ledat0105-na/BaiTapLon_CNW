@@ -17,7 +17,7 @@ public class ShopController : Controller
     }
 
     // GET: Shop - Danh sách sản phẩm
-    public async Task<IActionResult> Index(string? search, long? categoryId, string? sortBy, int page = 1, int pageSize = 12)
+    public async Task<IActionResult> Index(string? search, long? categoryId, string? sortBy, int page = 1, int pageSize = 9)
     {
         var query = _context.Products
             .Include(p => p.Category)

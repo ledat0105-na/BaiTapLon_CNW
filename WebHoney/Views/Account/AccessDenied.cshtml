@@ -13,17 +13,23 @@
     </div>
 </div>
 
-<div class="contact-page section">
+<link rel="stylesheet" href="~/assets/css/user-pages.css" />
+
+<div class="access-denied-container">
     <div class="container">
         <div class="row">
-            <div class="col-lg-6 offset-lg-3 text-center">
-                <div class="section-heading">
-                    <h6>| Lỗi</h6>
+            <div class="col-lg-8 offset-lg-2">
+                <div class="access-denied-card">
+                    <div class="access-denied-icon">
+                        <i class="fa fa-ban"></i>
+                    </div>
                     <h2>Bạn không có quyền truy cập trang này</h2>
-                </div>
-                <p>Bạn không có quyền để truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.</p>
-                <div class="mt-4">
-                    <a asp-controller="Home" asp-action="Index" class="orange-button">Về trang chủ</a>
+                    <p>Bạn không có quyền để truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.</p>
+                    <div class="mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="orange-button" style="display: inline-block; width: auto; padding: 12px 30px;">
+                            <i class="fa fa-home me-2"></i>Về trang chủ
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

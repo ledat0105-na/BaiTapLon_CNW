@@ -1,0 +1,96 @@
+/* Notifications CSS for User Layout */
+
+.notification-menu-item {
+    position: relative;
+}
+
+.notification-bell-link {
+    position: relative;
+    display: block;
+    padding: 8px 12px;
+    color: #2c3e50;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.notification-bell-link:hover {
+    color: #ff6b35;
+    background: rgba(255,107,53,0.1);
+    border-radius: 5px;
+}
+
+.notification-badge-user {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    text-align: center;
+    line-height: 14px;
+}
+
+.notification-dropdown-user {
+    min-width: 350px !important;
+    max-width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    padding: 0;
+}
+
+.notification-dropdown-user .dropdown-header {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.notification-dropdown-user .notification-item {
+    list-style: none;
+}
+
+.notification-dropdown-user .notification-item .dropdown-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.notification-dropdown-user .notification-item:last-child .dropdown-item {
+    border-bottom: none;
+}
+
+.notification-dropdown-user .notification-item.notification-unread {
+    background: #f8f9fa;
+}
+
+.notification-dropdown-user .notification-item.notification-unread .dropdown-item {
+    border-left: 3px solid #ff6b35;
+    font-weight: 600;
+}
+
+.notification-dropdown-user .notification-item:hover .dropdown-item {
+    background: #f0f0f0;
+}
+
+.notification-dropdown-user .notification-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.notification-dropdown-user .notification-icon i {
+    font-size: 16px;
+}
+

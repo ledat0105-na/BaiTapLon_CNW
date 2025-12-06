@@ -4,7 +4,6 @@ using WebHoney.Data;
 using WebHoney.Models;
 using WebHoney.Extensions;
 using WebHoney.Services;
-using WebHoney.Extensions;
 using WebHoney.ViewModels;
 using AuthService = WebHoney.Services.IAuthenticationService;
 
@@ -17,14 +16,16 @@ public class AccountController : Controller
     private readonly ILogger<AccountController> _logger;
     private readonly IConfiguration _configuration;
     private readonly ICartService _cartService;
+    private readonly IWebHostEnvironment _env;
 
-    public AccountController(AuthService authService, ApplicationDbContext context, ILogger<AccountController> logger, IConfiguration configuration, ICartService cartService)
+    public AccountController(AuthService authService, ApplicationDbContext context, ILogger<AccountController> logger, IConfiguration configuration, ICartService cartService, IWebHostEnvironment env)
     {
         _authService = authService;
         _context = context;
         _logger = logger;
         _configuration = configuration;
         _cartService = cartService;
+        _env = env;
     }
 
     // GET: Account/Register
@@ -109,11 +110,28 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var user = await _authService.LoginAsync(model.UsernameOrEmail, model.Password);
+        var loginResult = await _authService.LoginWithResultAsync(model.UsernameOrEmail, model.Password);
 
+        if (!loginResult.Success)
+        {
+            if (!string.IsNullOrEmpty(loginResult.LockReason))
+            {
+                // Tài khoản bị khóa - lưu lý do vào TempData và ViewData để hiển thị modal
+                TempData["AccountLocked"] = true;
+                TempData["LockReason"] = loginResult.LockReason;
+                ViewData["AccountLocked"] = true;
+                ViewData["LockReason"] = loginResult.LockReason;
+                return View(model);
+            }
+            
+            ModelState.AddModelError("", loginResult.ErrorMessage ?? "Tên đăng nhập/email hoặc mật khẩu không đúng!");
+            return View(model);
+        }
+
+        var user = loginResult.User;
         if (user == null)
         {
-            ModelState.AddModelError("", "Tên đăng nhập/email hoặc mật khẩu không đúng!");
+            ModelState.AddModelError("", "Đăng nhập thất bại. Vui lòng thử lại!");
             return View(model);
         }
 
@@ -204,6 +222,85 @@ public class AccountController : Controller
         };
 
         return View(vm);
+    }
+
+    // POST: Account/UploadAvatar - Upload ảnh đại diện
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UploadAvatar(IFormFile avatarFile)
+    {
+        var userId = HttpContext.Session.GetUserId();
+        if (!userId.HasValue)
+        {
+            return Json(new { success = false, message = "Vui lòng đăng nhập." });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+        if (user == null)
+        {
+            return Json(new { success = false, message = "Không tìm thấy tài khoản." });
+        }
+
+        if (avatarFile == null || avatarFile.Length == 0)
+        {
+            return Json(new { success = false, message = "Vui lòng chọn ảnh." });
+        }
+
+        // Kiểm tra định dạng ảnh
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        var fileExtension = Path.GetExtension(avatarFile.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(fileExtension))
+        {
+            return Json(new { success = false, message = "Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp)." });
+        }
+
+        // Kiểm tra kích thước file (max 5MB)
+        if (avatarFile.Length > 5 * 1024 * 1024)
+        {
+            return Json(new { success = false, message = "Kích thước file không được vượt quá 5MB." });
+        }
+
+        try
+        {
+            // Tạo thư mục uploads/avatars nếu chưa có
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "avatars");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Xóa ảnh cũ nếu có
+            if (!string.IsNullOrEmpty(user.AvatarUrl))
+            {
+                var oldFilePath = Path.Combine(_env.WebRootPath, user.AvatarUrl.TrimStart('/'));
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+            }
+
+            // Tạo tên file unique
+            var fileName = $"{Guid.NewGuid()}{fileExtension}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Lưu file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await avatarFile.CopyToAsync(stream);
+            }
+
+            // Cập nhật URL vào database
+            user.AvatarUrl = $"/uploads/avatars/{fileName}";
+            user.UpdatedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Cập nhật ảnh đại diện thành công!", avatarUrl = user.AvatarUrl });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Lỗi khi upload avatar");
+            return Json(new { success = false, message = "Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại." });
+        }
     }
 
     // GET: Account/Logout

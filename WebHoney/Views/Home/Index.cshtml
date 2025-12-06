@@ -4,44 +4,52 @@
     var featuredProducts = (List<WebHoney.Models.FeaturedProduct>)ViewData["FeaturedProducts"] ?? new List<WebHoney.Models.FeaturedProduct>();
 }
 
-<div class="main-banner">
-    <div class="owl-carousel owl-banner">
-      @if (banners.Any())
+<div class="main-banner" style="min-height: 500px; display: block !important; visibility: visible !important; position: relative;">
+    <div class="owl-carousel owl-banner" style="min-height: 500px;">
+      @{
+          var hasBanners = banners != null && banners.Any() && banners.Any(b => !string.IsNullOrEmpty(b.ImageUrl));
+      }
+      @if (hasBanners)
       {
           @foreach (var banner in banners)
           {
-              var timestamp = banner.UpdatedAt?.ToString("yyyyMMddHHmmss") ?? banner.CreatedAt.ToString("yyyyMMddHHmmss");
-              var imageUrlWithCache = $"{banner.ImageUrl}?v={timestamp}";
-              <div class="item" style="background-image: url('@imageUrlWithCache');">
-                  <div class="header-text">
-                      @if (!string.IsNullOrEmpty(banner.Title))
-                      {
-                          <span class="category">@banner.Title</span>
-                      }
-                      @if (!string.IsNullOrEmpty(banner.Subtitle))
-                      {
-                          <h2>@banner.Subtitle</h2>
-                      }
+              if (!string.IsNullOrEmpty(banner.ImageUrl))
+              {
+                  var timestamp = banner.UpdatedAt?.ToString("yyyyMMddHHmmss") ?? banner.CreatedAt.ToString("yyyyMMddHHmmss");
+                  var imageUrlWithCache = $"{banner.ImageUrl}?v={timestamp}";
+                  <div class="item" style="background-image: url('@imageUrlWithCache'); min-height: 500px; background-size: cover; background-position: center; background-repeat: no-repeat;">
+                      <div class="header-text">
+                          @if (!string.IsNullOrEmpty(banner.Title))
+                          {
+                              <span class="category">@banner.Title</span>
+                          }
+                          @if (!string.IsNullOrEmpty(banner.Subtitle))
+                          {
+                              <h2>@banner.Subtitle</h2>
+                          }
+                      </div>
                   </div>
-              </div>
+              }
           }
       }
-      else
+      
+      <!-- Luôn hiển thị fallback banners để đảm bảo có nội dung -->
+      @if (!hasBanners)
       {
           <!-- Fallback banners nếu không có banner trong database -->
-          <div class="item item-1">
+          <div class="item item-1" style="min-height: 500px; background-size: cover; background-position: center;">
             <div class="header-text">
               <span class="category">Chất lượng cao!</span>
               <h2>Mật ong thiên nhiên tốt nhất cho bạn</h2>
             </div>
           </div>
-          <div class="item item-2">
+          <div class="item item-2" style="min-height: 500px; background-size: cover; background-position: center;">
             <div class="header-text">
               <span class="category">Nhanh tay!</span>
               <h2>Mật ong nguyên chất tốt nhất</h2>
             </div>
           </div>
-          <div class="item item-3">
+          <div class="item item-3" style="min-height: 500px; background-size: cover; background-position: center;">
             <div class="header-text">
               <span class="category">Đặt ngay!</span>
               <h2>Mật ong hảo hạng chất lượng cao</h2>
@@ -140,64 +148,50 @@
     </div>
   </div>
 
-  <div class="video section" style="padding: 60px 0; background: #fff;">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 offset-lg-2">
-          <div class="section-heading text-center">
-            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Video Giới Thiệu</h6>
-            <h2 style="color: #2c3e50; font-weight: 700; font-size: 32px;">Khám Phá Quy Trình Sản Xuất Mật Ong</h2>
-            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Xem video để hiểu rõ hơn về quy trình thu hoạch và chế biến mật ong thiên nhiên nguyên chất của chúng tôi</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="video-content" style="padding-bottom: 60px; background: #fff;">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-10 offset-lg-1">
-          <div class="video-frame" style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <img src="~/assets/images/video-frame.jpg" alt="Video giới thiệu" style="width: 100%; height: auto; display: block;">
-            <a href="https://youtube.com" target="_blank" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,107,53,0.9); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; text-decoration: none; transition: all 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.3);" 
-               onmouseover="this.style.background='rgba(255,107,53,1)'; this.style.transform='translate(-50%, -50%) scale(1.1)'" 
-               onmouseout="this.style.background='rgba(255,107,53,0.9)'; this.style.transform='translate(-50%, -50%) scale(1)'">
-              <i class="fa fa-play" style="margin-left: 5px;"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="fun-facts" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); padding: 60px 0; color: #fff;">
+  <div class="fun-facts" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); padding: 80px 0; position: relative; overflow: hidden;">
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
           <div class="wrapper">
-            <div class="row">
-              <div class="col-lg-4">
-                <div class="counter text-center" style="padding: 20px;">
-                  <h2 class="timer count-title count-number" data-to="500" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
-                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
-                    <i class="fa fa-users me-2"></i> Khách Hàng<br>Hài Lòng
+            <div class="row g-4">
+              <!-- Card 1: Khách Hàng -->
+              <div class="col-lg-4 col-md-4 col-sm-6">
+                <div class="counter text-center" style="background: #fff; border-radius: 20px; padding: 40px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.2)'">
+                  <div style="position: absolute; top: -15px; right: -15px; width: 50px; height: 50px; background: #ff6b35; border-radius: 50%; box-shadow: 0 5px 15px rgba(255,107,53,0.5);"></div>
+                  <div style="margin-bottom: 20px;">
+                    <i class="fa fa-users" style="font-size: 48px; color: #ff6b35; margin-bottom: 15px;"></i>
+                  </div>
+                  <h2 class="timer count-title count-number" data-to="500" data-speed="1000" style="color: #2c3e50; font-size: 56px; font-weight: 800; margin-bottom: 15px; line-height: 1.2;">0</h2>
+                  <p class="count-text" style="color: #555; font-size: 18px; font-weight: 600; margin: 0; line-height: 1.6;">
+                    Khách Hàng<br><span style="color: #ff6b35;">Hài Lòng</span>
                   </p>
                 </div>
               </div>
-              <div class="col-lg-4">
-                <div class="counter text-center" style="padding: 20px;">
-                  <h2 class="timer count-title count-number" data-to="10" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
-                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
-                    <i class="fa fa-calendar-alt me-2"></i> Năm<br>Kinh Nghiệm
+              
+              <!-- Card 2: Năm Kinh Nghiệm -->
+              <div class="col-lg-4 col-md-4 col-sm-6">
+                <div class="counter text-center" style="background: #fff; border-radius: 20px; padding: 40px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.2)'">
+                  <div style="position: absolute; top: -15px; right: -15px; width: 50px; height: 50px; background: #ff6b35; border-radius: 50%; box-shadow: 0 5px 15px rgba(255,107,53,0.5);"></div>
+                  <div style="margin-bottom: 20px;">
+                    <i class="fa fa-calendar-alt" style="font-size: 48px; color: #ff6b35; margin-bottom: 15px;"></i>
+                  </div>
+                  <h2 class="timer count-title count-number" data-to="10" data-speed="1000" style="color: #2c3e50; font-size: 56px; font-weight: 800; margin-bottom: 15px; line-height: 1.2;">0</h2>
+                  <p class="count-text" style="color: #555; font-size: 18px; font-weight: 600; margin: 0; line-height: 1.6;">
+                    Năm<br><span style="color: #ff6b35;">Kinh Nghiệm</span>
                   </p>
                 </div>
               </div>
-              <div class="col-lg-4">
-                <div class="counter text-center" style="padding: 20px;">
-                  <h2 class="timer count-title count-number" data-to="100" data-speed="1000" style="color: #fff; font-size: 48px; font-weight: 700; margin-bottom: 10px;">0</h2>
-                  <p class="count-text" style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
-                    <i class="fa fa-trophy me-2"></i> Sản Phẩm<br>Chất Lượng
+              
+              <!-- Card 3: Sản Phẩm Chất Lượng -->
+              <div class="col-lg-4 col-md-4 col-sm-6">
+                <div class="counter text-center" style="background: #fff; border-radius: 20px; padding: 40px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.2)'">
+                  <div style="position: absolute; top: -15px; right: -15px; width: 50px; height: 50px; background: #ff6b35; border-radius: 50%; box-shadow: 0 5px 15px rgba(255,107,53,0.5);"></div>
+                  <div style="margin-bottom: 20px;">
+                    <i class="fa fa-trophy" style="font-size: 48px; color: #ff6b35; margin-bottom: 15px;"></i>
+                  </div>
+                  <h2 class="timer count-title count-number" data-to="100" data-speed="1000" style="color: #2c3e50; font-size: 56px; font-weight: 800; margin-bottom: 15px; line-height: 1.2;">0</h2>
+                  <p class="count-text" style="color: #555; font-size: 18px; font-weight: 600; margin: 0; line-height: 1.6;">
+                    Sản Phẩm<br><span style="color: #ff6b35;">Chất Lượng</span>
                   </p>
                 </div>
               </div>
@@ -212,10 +206,9 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-8 offset-lg-2">
-          <div class="section-heading text-center" style="margin-bottom: 50px;">
-            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Ưu Đãi Đặc Biệt</h6>
-            <h2 style="color: #2c3e50; font-weight: 700; font-size: 36px; line-height: 1.3;">Sản Phẩm Bán Chạy Nhất</h2>
-            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Những sản phẩm được khách hàng yêu thích nhất với giá ưu đãi đặc biệt</p>
+          <div class="section-heading text-center" style="margin-bottom: 0; padding-bottom: 100px;">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">| ƯU ĐÃI ĐẶC BIỆT</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 36px; line-height: 1.6; margin-bottom: 0; padding-bottom: 40px;">Sản Phẩm Bán Chạy Nhất</h2>
           </div>
         </div>
       </div>
@@ -223,25 +216,57 @@
         <div class="col-lg-12">
           <div class="tabs-content">
             <div class="row">
-              <div class="nav-wrapper" style="margin-top: 80px; margin-bottom: 30px;">
-                <ul class="nav nav-tabs justify-content-center" role="tablist" style="border-bottom: 2px solid #eee;">
+              <div class="nav-wrapper" style="margin-top: 0; margin-bottom: 40px;">
+                <ul class="nav nav-tabs justify-content-center" role="tablist" style="border-bottom: none; gap: 15px; flex-wrap: wrap;">
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link home-deal-tab active" id="best-seller-tab" data-bs-toggle="tab" data-bs-target="#best-seller" type="button" role="tab" aria-controls="best-seller" aria-selected="true">
-                      <i class="fa fa-fire me-2" style="color: #ff6b35;"></i> Bán Chạy Nhất
+                    <button class="nav-link home-deal-tab active" id="best-seller-tab" data-bs-toggle="tab" data-bs-target="#best-seller" type="button" role="tab" aria-controls="best-seller" aria-selected="true"
+                            style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; border: none; border-radius: 25px; padding: 12px 30px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,107,53,0.3); display: flex; align-items: center; justify-content: center; text-align: center;">
+                      <i class="fa fa-fire me-2"></i> Bán Chạy Nhất
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link home-deal-tab" id="new-arrival-tab" data-bs-toggle="tab" data-bs-target="#new-arrival" type="button" role="tab" aria-controls="new-arrival" aria-selected="false">
+                    <button class="nav-link home-deal-tab" id="new-arrival-tab" data-bs-toggle="tab" data-bs-target="#new-arrival" type="button" role="tab" aria-controls="new-arrival" aria-selected="false"
+                            style="background: #2c3e50; color: #b0b0b0; border: none; border-radius: 25px; padding: 12px 30px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; text-align: center;">
                       <i class="fa fa-star me-2" style="color: #ff6b35;"></i> Sản Phẩm Mới
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link home-deal-tab" id="special-offer-tab" data-bs-toggle="tab" data-bs-target="#special-offer" type="button" role="tab" aria-controls="special-offer" aria-selected="false">
+                    <button class="nav-link home-deal-tab" id="special-offer-tab" data-bs-toggle="tab" data-bs-target="#special-offer" type="button" role="tab" aria-controls="special-offer" aria-selected="false"
+                            style="background: #2c3e50; color: #b0b0b0; border: none; border-radius: 25px; padding: 12px 30px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; text-align: center;">
                       <i class="fa fa-gift me-2" style="color: #ff6b35;"></i> Khuyến Mãi
                     </button>
                   </li>
                 </ul>
-              </div>              
+              </div>
+              
+              <style>
+                /* CSS cho tabs */
+                .nav-link.home-deal-tab {
+                  cursor: pointer;
+                }
+                
+                .nav-link.home-deal-tab:not(.active):hover {
+                  background: #34495e !important;
+                  color: #fff !important;
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 12px rgba(44,62,80,0.3) !important;
+                }
+                
+                .nav-link.home-deal-tab:not(.active):hover i {
+                  color: #ff6b35 !important;
+                }
+                
+                .nav-link.home-deal-tab.active {
+                  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
+                  color: #fff !important;
+                  border: none !important;
+                  box-shadow: 0 4px 15px rgba(255,107,53,0.3) !important;
+                }
+                
+                .nav-link.home-deal-tab.active i {
+                  color: #fff !important;
+                }
+              </style>              
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="best-seller" role="tabpanel" aria-labelledby="best-seller-tab">
                   <div class="row align-items-center" style="background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
@@ -281,14 +306,26 @@
                     </div>
                     <div class="col-lg-5">
                       <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                        <img src="~/assets/images/deal-01.jpg" alt="Sản phẩm bán chạy" style="width: 100%; height: auto; display: block;">
+                        @{
+                            var homePageSettings = ViewData["HomePageSettings"] as WebHoney.Models.HomePageSettings;
+                            var bestSellerImage = homePageSettings?.BestSellerImageUrl ?? "/assets/images/deal-01.jpg";
+                        }
+                        <img src="@bestSellerImage" alt="Sản phẩm bán chạy" style="width: 100%; height: auto; display: block;" onerror="this.src='/assets/images/deal-01.jpg'; this.onerror=null;">
                       </div>
                     </div>
                     <div class="col-lg-3">
-                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Mật Ong Hoa Nhãn</h4>
-                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Mật ong hoa nhãn với hương vị đặc trưng, ngọt thanh tự nhiên. Sản phẩm được thu hoạch từ các vườn nhãn tại Tây Nguyên, đảm bảo chất lượng và độ tinh khiết cao nhất.</p>
+                      @{
+                          var bestSellerTitle = homePageSettings?.BestSellerTitle ?? "Mật Ong Hoa Nhãn";
+                          var bestSellerDescription = homePageSettings?.BestSellerDescription ?? "Mật ong hoa nhãn với hương vị đặc trưng, ngọt thanh tự nhiên. Sản phẩm được thu hoạch từ các vườn nhãn tại Tây Nguyên, đảm bảo chất lượng và độ tinh khiết cao nhất.";
+                          var bestSellerProductId = homePageSettings?.BestSellerProductId;
+                          var shopUrl = bestSellerProductId.HasValue 
+                              ? Url.Action("Details", "Shop", new { id = bestSellerProductId.Value })
+                              : Url.Action("Index", "Shop");
+                      }
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">@bestSellerTitle</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">@bestSellerDescription</p>
                       <div class="icon-button">
-                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                        <a href="@shopUrl" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
                           <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
@@ -330,14 +367,25 @@
                     </div>
                     <div class="col-lg-5">
                       <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                        <img src="~/assets/images/deal-02.jpg" alt="Sản phẩm mới" style="width: 100%; height: auto; display: block;">
+                        @{
+                            var newArrivalImage = homePageSettings?.NewArrivalImageUrl ?? "/assets/images/deal-02.jpg";
+                        }
+                        <img src="@newArrivalImage" alt="Sản phẩm mới" style="width: 100%; height: auto; display: block;" onerror="this.src='/assets/images/deal-02.jpg'; this.onerror=null;">
                       </div>
                     </div>
                     <div class="col-lg-3">
-                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Mật Ong Rừng</h4>
-                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Mật ong rừng nguyên chất từ các khu rừng nguyên sinh, mang hương vị đậm đà và nhiều dưỡng chất quý giá. Sản phẩm được thu hoạch thủ công, đảm bảo chất lượng cao nhất.</p>
+                      @{
+                          var newArrivalTitle = homePageSettings?.NewArrivalTitle ?? "Mật Ong Rừng";
+                          var newArrivalDescription = homePageSettings?.NewArrivalDescription ?? "Mật ong rừng nguyên chất từ các khu rừng nguyên sinh, mang hương vị đậm đà và nhiều dưỡng chất quý giá. Sản phẩm được thu hoạch thủ công, đảm bảo chất lượng cao nhất.";
+                          var newArrivalProductId = homePageSettings?.NewArrivalProductId;
+                          var newArrivalShopUrl = newArrivalProductId.HasValue 
+                              ? Url.Action("Details", "Shop", new { id = newArrivalProductId.Value })
+                              : Url.Action("Index", "Shop");
+                      }
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">@newArrivalTitle</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">@newArrivalDescription</p>
                       <div class="icon-button">
-                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                        <a href="@newArrivalShopUrl" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
                           <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
@@ -379,17 +427,37 @@
                     </div>
                     <div class="col-lg-5">
                       <div style="border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;">
-                        <img src="~/assets/images/deal-03.jpg" alt="Khuyến mãi" style="width: 100%; height: auto; display: block;">
+                        @{
+                            var specialOfferImage = homePageSettings?.SpecialOfferImageUrl ?? "/assets/images/deal-03.jpg";
+                        }
+                        <img src="@specialOfferImage" alt="Khuyến mãi" style="width: 100%; height: auto; display: block;" onerror="this.src='/assets/images/deal-03.jpg'; this.onerror=null;">
                         <div style="position: absolute; top: 20px; right: 20px; background: rgba(231,76,60,0.95); color: #fff; padding: 15px 20px; border-radius: 50%; font-weight: 700; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
                           -20%
                         </div>
                       </div>
                     </div>
                     <div class="col-lg-3">
-                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">Combo Đặc Biệt</h4>
+                      @{
+                          var specialOfferTitle = homePageSettings?.SpecialOfferTitle ?? "Combo Đặc Biệt";
+                          var specialOfferDescription = homePageSettings?.SpecialOfferDescription ?? "Combo đặc biệt với nhiều ưu đãi hấp dẫn. Mua ngay để nhận được giá tốt nhất và quà tặng kèm theo.";
+                          var specialOfferProductId = homePageSettings?.SpecialOfferProductId;
+                          var specialOfferShopUrl = specialOfferProductId.HasValue 
+                              ? Url.Action("Details", "Shop", new { id = specialOfferProductId.Value })
+                              : Url.Action("Index", "Shop");
+                      }
+                      <h4 style="color: #2c3e50; font-weight: 700; margin-bottom: 20px; font-size: 24px;">@specialOfferTitle</h4>
+                      <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">@specialOfferDescription</p>
+                      <div class="icon-button">
+                        <a href="@specialOfferShopUrl" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
+                          <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
+                        </a>
+                      </div>
+                    </div>
                       <p style="color: #555; line-height: 1.8; margin-bottom: 25px;">Combo 3 chai mật ong với giá ưu đãi đặc biệt. Tiết kiệm đến 20% khi mua combo. Sản phẩm đa dạng, phù hợp cho gia đình sử dụng lâu dài.</p>
                       <div class="icon-button">
-                        <a href="@Url.Action("Index", "Shop")" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                        <a href="@Url.Action("Index", "Shop")" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 15px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
                           <i class="fa fa-shopping-bag me-2"></i> Mua Ngay
@@ -486,7 +554,7 @@
             </ul>
                       }
                       <div class="main-button" style="margin-top: auto;">
-                        <a href="@productLink" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
+                        <a href="@productLink" style="display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,53,0.3);" 
                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.4)'" 
                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255,107,53,0.3)'">
                           <i class="fa fa-shopping-cart me-2"></i> Xem chi tiết
@@ -513,7 +581,7 @@
                     <li style="margin-bottom: 8px; color: #555;"><i class="fa fa-box me-2" style="color: #ff6b35;"></i> Tồn kho: <span style="font-weight: 600;">50 sản phẩm</span></li>
             </ul>
                   <div class="main-button" style="margin-top: 15px;">
-                    <a href="#" style="display: block; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600;">
+                    <a href="#" style="display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600;">
                       <i class="fa fa-shopping-cart me-2"></i> Xem chi tiết
                     </a>
             </div>
@@ -525,21 +593,21 @@
     </div>
   </div>
 
-  <div class="contact section" style="padding: 60px 0; background: #fff;">
+  <div class="contact section" style="padding: 60px 0 0 0; background: #fff;">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 offset-lg-2">
-          <div class="section-heading text-center">
-            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px;">| Liên Hệ</h6>
-            <h2 style="color: #2c3e50; font-weight: 700; font-size: 32px;">Liên Hệ Với Chúng Tôi</h2>
-            <p style="color: #7f8c8d; font-size: 16px; margin-top: 15px;">Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về sản phẩm mật ong</p>
+          <div class="section-heading text-center" style="margin-bottom: 30px;">
+            <h6 style="color: #ff6b35; font-weight: 600; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">| LIÊN HỆ</h6>
+            <h2 style="color: #2c3e50; font-weight: 700; font-size: 32px; margin-bottom: 10px;">Liên Hệ Với Chúng Tôi</h2>
+            <p style="color: #7f8c8d; font-size: 16px; margin-top: 0; margin-bottom: 0;">Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về sản phẩm mật ong</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="contact-content" style="margin-top: 60px;">
+  <div class="contact-content" style="margin-top: 0; padding-bottom: 60px;">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-6">
@@ -671,8 +739,130 @@
   }
 </style>
 
+@section Scripts {
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
+    // Cấu hình banner carousel với thời gian chuyển slide từ database
+    @{
+        var bannerInterval = ViewData["BannerSlideInterval"] as int? ?? 5000; // Mặc định 5 giây
+    }
+    var bannerSlideInterval = @bannerInterval; // Thời gian chuyển slide (mili giây)
+    
+    console.log('Banner slide interval:', bannerSlideInterval, 'ms');
+    console.log('Banner count from ViewData:', @(banners != null ? banners.Count : 0));
+    
+    // Kiểm tra banner items trong DOM
+    var bannerItems = $('.owl-banner .item');
+    console.log('Banner items found in DOM:', bannerItems.length);
+    
+    @if (banners != null && banners.Any())
+    {
+        <text>
+        console.log('Banner details from database:');
+        @foreach (var banner in banners)
+        {
+            <text>
+            console.log('  - Banner ID: @banner.Id, ImageUrl: @banner.ImageUrl, IsActive: @banner.IsActive, DisplayOrder: @banner.DisplayOrder');
+            </text>
+        }
+        </text>
+    }
+    else
+    {
+        <text>
+        console.warn('No banners found in database! Using fallback banners.');
+        </text>
+    }
+    
+    // Hàm khởi tạo carousel
+    function initBannerCarousel() {
+        var $bannerCarousel = $('.owl-banner');
+        var itemCount = $bannerCarousel.find('.item').length;
+        
+        console.log('Initializing banner carousel, found', itemCount, 'items');
+        
+        // Kiểm tra xem có banner items không
+        if (itemCount === 0) {
+            console.error('Không tìm thấy banner items trong DOM! Banner section sẽ không hiển thị.');
+            // Thêm fallback banner nếu không có
+            $bannerCarousel.html('<div class="item item-1" style="min-height: 500px;"><div class="header-text"><span class="category">Chất lượng cao!</span><h2>Mật ong thiên nhiên tốt nhất cho bạn</h2></div></div>');
+            itemCount = 1;
+        }
+        
+        // Kiểm tra xem owlCarousel đã được load chưa
+        if (typeof $.fn.owlCarousel === 'undefined') {
+            console.error('Owl Carousel chưa được load!');
+            setTimeout(initBannerCarousel, 200);
+            return;
+        }
+        
+        // Destroy carousel hiện tại nếu có (từ custom.js hoặc lần khởi tạo trước)
+        if ($bannerCarousel.data('owl.carousel')) {
+            $bannerCarousel.trigger('destroy.owl.carousel');
+            $bannerCarousel.removeClass('owl-loaded owl-carousel');
+            $bannerCarousel.find('.owl-stage-outer').remove();
+        }
+        
+        // Khởi tạo lại với autoplay settings từ database
+        var carouselOptions = {
+            center: true,
+            items: 1,
+            loop: $bannerCarousel.find('.item').length > 1, // Chỉ loop nếu có nhiều hơn 1 item
+            nav: true,
+            dots: true,
+            navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i>','<i class="fa fa-angle-right" aria-hidden="true"></i>'],
+            margin: 30,
+            responsive: {
+                992: { items: 1 },
+                1200: { items: 1 }
+            }
+        };
+        
+        // Thêm autoplay nếu interval > 0
+        if (bannerSlideInterval > 0) {
+            carouselOptions.autoplay = true;
+            carouselOptions.autoplayTimeout = bannerSlideInterval;
+            carouselOptions.autoplayHoverPause = true; // Tạm dừng khi hover
+            console.log('Autoplay enabled with interval:', bannerSlideInterval, 'ms');
+        } else {
+            carouselOptions.autoplay = false; // Tắt autoplay nếu interval = 0
+            console.log('Autoplay disabled');
+        }
+        
+        try {
+            $bannerCarousel.owlCarousel(carouselOptions);
+            console.log('Banner carousel initialized successfully with', $bannerCarousel.find('.item').length, 'items');
+            
+            // Đảm bảo banner section hiển thị
+            $('.main-banner').css({
+                'display': 'block',
+                'visibility': 'visible',
+                'opacity': '1'
+            });
+        } catch (error) {
+            console.error('Error initializing banner carousel:', error);
+            // Nếu lỗi, vẫn đảm bảo banner section hiển thị
+            $('.main-banner').css({
+                'display': 'block',
+                'visibility': 'visible',
+                'opacity': '1'
+            });
+        }
+    }
+    
+    // Đợi để đảm bảo custom.js và các script khác đã chạy xong
+    setTimeout(initBannerCarousel, 300);
+    
+    // Fallback: Nếu sau 1 giây vẫn không có banner, thêm fallback
+    setTimeout(function() {
+        if ($('.owl-banner .item').length === 0) {
+            console.warn('No banner items found after 1 second, adding fallback');
+            $('.owl-banner').html('<div class="item item-1" style="min-height: 500px;"><div class="header-text"><span class="category">Chất lượng cao!</span><h2>Mật ong thiên nhiên tốt nhất cho bạn</h2></div></div>');
+            initBannerCarousel();
+        }
+    }, 1000);
+    
+    // Code cho tìm vị trí (nếu có)
     const findLocationBtn = document.getElementById('findMyLocationBtn');
     const locationStatus = document.getElementById('locationStatus');
     const locationText = document.getElementById('locationText');
@@ -751,3 +941,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+}

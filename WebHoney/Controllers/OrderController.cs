@@ -62,7 +62,7 @@ public class OrderController : Controller
     }
 
     // GET: Order/Details/5
-    public async Task<IActionResult> Details(long? id)
+    public async Task<IActionResult> Details(long? id, string? returnUrl = null)
     {
         if (id == null) return NotFound();
 
@@ -74,20 +74,89 @@ public class OrderController : Controller
 
         if (order == null) return NotFound();
 
+        ViewData["ReturnUrl"] = returnUrl;
         return View(order);
     }
 
     // POST: Order/UpdateStatus/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateStatus(long id, string status)
+    public async Task<IActionResult> UpdateStatus(long id, string status, string? rejectionReason = null)
     {
-        var order = await _context.Orders.FindAsync(id);
+        var order = await _context.Orders
+            .Include(o => o.Customer)
+            .FirstOrDefaultAsync(o => o.Id == id);
         if (order == null) return NotFound();
 
+        var oldStatus = order.Status;
         order.Status = status;
         order.UpdatedAt = DateTime.Now;
+        
+        // Lưu lý do từ chối nếu có
+        if (status == "CANCELED" && !string.IsNullOrWhiteSpace(rejectionReason))
+        {
+            order.RejectionReason = rejectionReason.Trim();
+        }
+        else if (status != "CANCELED")
+        {
+            order.RejectionReason = null;
+        }
+
         await _context.SaveChangesAsync();
+
+        // Tạo thông báo cho khách hàng về thay đổi trạng thái đơn hàng
+        if (order.UserId.HasValue)
+        {
+            string notificationTitle = "";
+            string notificationMessage = "";
+            string notificationType = "INFO";
+
+            switch (status)
+            {
+                case "PROCESSING":
+                    notificationTitle = "Đơn hàng đã được xác nhận";
+                    notificationMessage = $"Đơn hàng #{order.Id} của bạn đã được xác nhận và đang được xử lý.";
+                    notificationType = "SUCCESS";
+                    break;
+                case "SHIPPING":
+                    notificationTitle = "Đơn hàng đang được giao";
+                    notificationMessage = $"Đơn hàng #{order.Id} của bạn đang được vận chuyển đến địa chỉ giao hàng.";
+                    notificationType = "SUCCESS";
+                    break;
+                case "COMPLETED":
+                    notificationTitle = "Đơn hàng đã hoàn thành";
+                    notificationMessage = $"Đơn hàng #{order.Id} của bạn đã được giao thành công. Cảm ơn bạn đã mua sắm!";
+                    notificationType = "SUCCESS";
+                    break;
+                case "CANCELED":
+                    notificationTitle = "Đơn hàng đã bị hủy";
+                    notificationMessage = $"Đơn hàng #{order.Id} của bạn đã bị hủy.";
+                    if (!string.IsNullOrWhiteSpace(rejectionReason))
+                    {
+                        notificationMessage += $" Lý do: {rejectionReason}";
+                    }
+                    notificationType = "ERROR";
+                    break;
+                default:
+                    notificationTitle = "Cập nhật trạng thái đơn hàng";
+                    notificationMessage = $"Trạng thái đơn hàng #{order.Id} đã được cập nhật thành: {status}";
+                    break;
+            }
+
+            var notification = new Notification
+            {
+                UserId = order.UserId.Value,
+                Title = notificationTitle,
+                Message = notificationMessage,
+                Type = notificationType,
+                RelatedId = order.Id,
+                RelatedType = "ORDER",
+                IsRead = false,
+                CreatedAt = DateTime.Now
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
 
         TempData["SuccessMessage"] = "Cập nhật trạng thái đơn hàng thành công!";
         return RedirectToAction(nameof(Details), new { id });

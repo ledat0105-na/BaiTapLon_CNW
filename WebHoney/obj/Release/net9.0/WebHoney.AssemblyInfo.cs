@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a6063ee2fd0b29aabd944112c6c6f366dd83ef3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+044be9b4b040ed3dfd337f24f675eca826871ad2")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebHoney")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

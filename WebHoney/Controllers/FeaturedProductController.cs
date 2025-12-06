@@ -8,6 +8,7 @@ using WebHoney.Models;
 namespace WebHoney.Controllers;
 
 [Authorize("Admin", "ADMIN")]
+[Route("Admin/FeaturedProduct")]
 public class FeaturedProductController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -22,6 +23,8 @@ public class FeaturedProductController : Controller
     }
 
     // GET: FeaturedProduct
+    [HttpGet("")]
+    [HttpGet("Index")]
     public async Task<IActionResult> Index()
     {
         var featuredProducts = await _context.FeaturedProducts
@@ -33,6 +36,7 @@ public class FeaturedProductController : Controller
     }
 
     // GET: FeaturedProduct/Create
+    [HttpGet("Create")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Products = new SelectList(await _context.Products.Where(p => p.IsActive).ToListAsync(), "Id", "Name");
@@ -40,7 +44,7 @@ public class FeaturedProductController : Controller
     }
 
     // POST: FeaturedProduct/Create
-    [HttpPost]
+    [HttpPost("Create")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(IFormFile? imageFile, string? imageUrl, long? productId, [Bind("Title,Subtitle,Description,DisplayOrder,IsActive")] FeaturedProduct featuredProduct)
     {
@@ -102,14 +106,47 @@ public class FeaturedProductController : Controller
             }
         }
 
+        // Kiểm tra nếu không có ảnh và không có URL
+        if (string.IsNullOrWhiteSpace(featuredProduct.ImageUrl))
+        {
+            ModelState.AddModelError("ImageUrl", "Vui lòng chọn ảnh hoặc nhập URL hình ảnh.");
+        }
+
+        // Xóa các lỗi validation không cần thiết
+        ModelState.Remove("Product");
+        ModelState.Remove("ProductId");
+
         if (ModelState.IsValid)
+        {
+            try
         {
             featuredProduct.CreatedAt = DateTime.Now;
             _context.Add(featuredProduct);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Thêm sản phẩm nổi bật thành công!";
-            TempData["ShowSuccessModal"] = true;
             return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Lỗi database khi lưu featured product");
+                ModelState.AddModelError("", "Có lỗi xảy ra khi lưu vào database. Vui lòng kiểm tra lại dữ liệu.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lưu featured product");
+                ModelState.AddModelError("", $"Có lỗi xảy ra khi lưu sản phẩm nổi bật: {ex.Message}");
+            }
+        }
+        else
+        {
+            // Log các lỗi validation để debug
+            foreach (var error in ModelState)
+            {
+                foreach (var err in error.Value.Errors)
+                {
+                    _logger.LogWarning("Validation error for {Key}: {Error}", error.Key, err.ErrorMessage);
+                }
+            }
         }
 
         ViewBag.Products = new SelectList(await _context.Products.Where(p => p.IsActive).ToListAsync(), "Id", "Name", productId);

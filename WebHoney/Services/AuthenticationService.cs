@@ -8,8 +8,17 @@ public interface IAuthenticationService
 {
     Task<bool> RegisterAsync(string username, string email, string password, string fullName, string? phone, string role = "Customer");
     Task<User?> LoginAsync(string usernameOrEmail, string password);
+    Task<LoginResult> LoginWithResultAsync(string usernameOrEmail, string password);
     string HashPassword(string password);
     bool VerifyPassword(string password, string hash);
+}
+
+public class LoginResult
+{
+    public bool Success { get; set; }
+    public User? User { get; set; }
+    public string? LockReason { get; set; }
+    public string? ErrorMessage { get; set; }
 }
 
 public class AuthenticationService : IAuthenticationService
@@ -100,6 +109,61 @@ public class AuthenticationService : IAuthenticationService
 
         _logger?.LogInformation($"User logged in successfully: {usernameOrEmail}");
         return user;
+    }
+
+    public async Task<LoginResult> LoginWithResultAsync(string usernameOrEmail, string password)
+    {
+        var result = new LoginResult();
+        
+        if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+        {
+            result.Success = false;
+            result.ErrorMessage = "Tên đăng nhập/email hoặc mật khẩu không được để trống";
+            return result;
+        }
+
+        var searchTerm = usernameOrEmail.Trim().ToLower();
+        var passwordToCheck = password.Trim();
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => 
+                (u.Username != null && u.Username.ToLower() == searchTerm) || 
+                u.Email.ToLower() == searchTerm);
+
+        if (user == null)
+        {
+            result.Success = false;
+            result.ErrorMessage = "Tên đăng nhập/email hoặc mật khẩu không đúng";
+            return result;
+        }
+
+        if (!user.IsActive)
+        {
+            result.Success = false;
+            result.LockReason = user.LockReason ?? "Tài khoản của bạn đã bị khóa";
+            return result;
+        }
+
+        if (string.IsNullOrEmpty(user.PasswordHash))
+        {
+            result.Success = false;
+            result.ErrorMessage = "Tài khoản không có mật khẩu";
+            return result;
+        }
+
+        if (!VerifyPassword(passwordToCheck, user.PasswordHash))
+        {
+            result.Success = false;
+            result.ErrorMessage = "Tên đăng nhập/email hoặc mật khẩu không đúng";
+            return result;
+        }
+
+        user.UpdatedAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        result.Success = true;
+        result.User = user;
+        return result;
     }
 
     public string HashPassword(string password)

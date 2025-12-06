@@ -199,7 +199,8 @@ public class CartController : Controller
     // POST: Cart/Checkout - Xác nhận thanh toán và tạo đơn hàng
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckoutConfirm(string customerName, string phone, string address)
+    public async Task<IActionResult> CheckoutConfirm(string customerName, string phone, string address, 
+        string? street, string? provinceCode, string? districtCode, string? wardCode)
     {
         if (!IsUserLoggedIn())
         {
@@ -213,50 +214,92 @@ public class CartController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        if (string.IsNullOrWhiteSpace(customerName) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(address))
+        if (string.IsNullOrWhiteSpace(customerName) || string.IsNullOrWhiteSpace(phone))
         {
             TempData["ErrorMessage"] = "Vui lòng nhập đầy đủ thông tin khách hàng.";
+            return RedirectToAction(nameof(Checkout));
+        }
+
+        // Xây dựng địa chỉ đầy đủ từ các phần
+        var fullAddress = BuildFullAddress(street, wardCode, districtCode, provinceCode);
+        if (string.IsNullOrWhiteSpace(fullAddress))
+        {
+            fullAddress = address; // Fallback về địa chỉ cũ nếu có
+        }
+
+        if (string.IsNullOrWhiteSpace(fullAddress))
+        {
+            TempData["ErrorMessage"] = "Vui lòng nhập địa chỉ giao hàng.";
             return RedirectToAction(nameof(Checkout));
         }
 
         // Tính tổng tiền
         var totalAmount = _cartService.GetCartTotal(HttpContext.Session);
 
-        // Tìm hoặc tạo khách hàng theo số điện thoại
-        var customer = await _context.Customers
-            .FirstOrDefaultAsync(c => c.Phone == phone);
+        // Lấy UserId từ session (khách hàng đã đăng nhập)
+        var userId = HttpContext.Session.GetUserId();
+        
+        Customer? customer = null;
+        
+        // Nếu khách hàng đã đăng nhập, tìm Customer theo UserId
+        if (userId.HasValue)
+        {
+            customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.UserId == userId.Value);
+        }
+        
+        // Nếu không tìm thấy Customer theo UserId, tìm theo số điện thoại
+        if (customer == null)
+        {
+            customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Phone == phone);
+        }
 
         if (customer == null)
         {
-            customer = new Customer
+            // Chỉ tạo Customer mới nếu khách hàng đã đăng nhập (có UserId)
+            if (userId.HasValue)
             {
-                FullName = customerName.Trim(),
-                Phone = phone.Trim(),
-                Address = address.Trim(),
-                CreatedAt = DateTime.Now,
-                IsActive = true
-            };
+                customer = new Customer
+                {
+                    UserId = userId.Value,
+                    FullName = customerName.Trim(),
+                    Phone = phone.Trim(),
+                    Address = fullAddress.Trim(),
+                    CreatedAt = DateTime.Now,
+                    IsActive = true
+                };
 
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Khách hàng chưa đăng nhập - không tạo Customer, chỉ lưu thông tin vào Order
+                // (Order sẽ có CustomerId = null)
+            }
         }
         else
         {
             // Cập nhật lại thông tin địa chỉ nếu thay đổi
             customer.FullName = customerName.Trim();
-            customer.Address = address.Trim();
+            customer.Address = fullAddress.Trim();
+            // Nếu Customer chưa có UserId và khách hàng đã đăng nhập, link UserId
+            if (!customer.UserId.HasValue && userId.HasValue)
+            {
+                customer.UserId = userId.Value;
+            }
             await _context.SaveChangesAsync();
         }
 
         // Tạo đơn hàng
-        var userId = HttpContext.Session.GetUserId();
         var order = new Order
         {
-            CustomerId = customer.Id,
+            CustomerId = customer?.Id, // Có thể null nếu khách hàng chưa đăng nhập
             UserId = userId,
             FullName = customerName.Trim(),
             TotalAmount = totalAmount,
-            ShippingAddress = address.Trim(),
+            ShippingAddress = fullAddress.Trim(),
             Phone = phone.Trim(),
             Status = "PENDING",
             CreatedAt = DateTime.Now
@@ -281,6 +324,28 @@ public class CartController : Controller
             _context.OrderDetails.Add(orderDetail);
         }
 
+        await _context.SaveChangesAsync();
+
+        // Tạo thông báo cho tất cả admin về đơn hàng mới
+        var admins = await _context.Users
+            .Where(u => u.Role == "ADMIN" || u.Role == "Admin")
+            .ToListAsync();
+
+        foreach (var admin in admins)
+        {
+            var notification = new Notification
+            {
+                UserId = admin.Id,
+                Title = "Đơn hàng mới",
+                Message = $"Khách hàng {customerName} vừa đặt đơn hàng #{order.Id} với tổng tiền {totalAmount.ToString("#,##0")} VNĐ",
+                Type = "INFO",
+                RelatedId = order.Id,
+                RelatedType = "ORDER",
+                IsRead = false,
+                CreatedAt = DateTime.Now
+            };
+            _context.Notifications.Add(notification);
+        }
         await _context.SaveChangesAsync();
 
         // Xóa giỏ hàng sau khi tạo đơn
@@ -371,6 +436,23 @@ public class CartController : Controller
     {
         var count = _cartService.GetCartItemCount(HttpContext.Session);
         return Json(new { count });
+    }
+
+    private string? BuildFullAddress(string? street, string? wardCode, string? districtCode, string? provinceCode)
+    {
+        // Địa chỉ đầy đủ sẽ được JavaScript tự động cập nhật vào trường Address
+        // Method này chỉ là fallback nếu cần
+        if (string.IsNullOrWhiteSpace(street) && 
+            string.IsNullOrWhiteSpace(wardCode) && 
+            string.IsNullOrWhiteSpace(districtCode) && 
+            string.IsNullOrWhiteSpace(provinceCode))
+        {
+            return null;
+        }
+
+        // Trường hợp đơn giản: nếu có street thì trả về street
+        // Thực tế địa chỉ đầy đủ sẽ được JavaScript cập nhật
+        return street;
     }
 }
 

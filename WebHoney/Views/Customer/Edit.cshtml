@@ -47,8 +47,32 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Address" class="form-label"></label>
-                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                        <label class="form-label">Địa chỉ</label>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="form-label small">Số nhà, tên đường</label>
+                                <input type="text" id="Street" class="form-control" placeholder="Ví dụ: 123 Đường ABC" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Tỉnh/Thành phố</label>
+                                <select id="ProvinceCode" class="form-select">
+                                    <option value="">-- Chọn tỉnh/thành phố --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Quận/Huyện</label>
+                                <select id="DistrictCode" class="form-select" disabled>
+                                    <option value="">-- Chọn quận/huyện --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Phường/Xã</label>
+                                <select id="WardCode" class="form-select" disabled>
+                                    <option value="">-- Chọn phường/xã --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" asp-for="Address" id="Address" />
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
 
@@ -75,5 +99,21 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/address-selector.js"></script>
+    <script>
+        // Khôi phục địa chỉ hiện có nếu có
+        document.addEventListener('DOMContentLoaded', function() {
+            var currentAddress = '@Html.Raw(Model.Address ?? "")';
+            if (currentAddress) {
+                // Hiển thị địa chỉ hiện tại trong trường Street để người dùng có thể chỉnh sửa
+                var streetInput = document.getElementById('Street');
+                if (streetInput) {
+                    streetInput.value = currentAddress;
+                }
+                // Lưu địa chỉ hiện tại vào trường Address ẩn
+                document.getElementById('Address').value = currentAddress;
+            }
+        });
+    </script>
 }
 

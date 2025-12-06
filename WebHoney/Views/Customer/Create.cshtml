@@ -36,6 +36,13 @@
                         <label asp-for="Email" class="form-label"></label>
                         <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" required />
                         <span asp-validation-for="Email" class="text-danger"></span>
+                        <small class="form-text text-muted">Email này sẽ được dùng làm tài khoản đăng nhập</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu đăng nhập</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Để trống sẽ dùng mật khẩu mặc định: 123456" />
+                        <small class="form-text text-muted">Nếu để trống, mật khẩu mặc định là: <strong>123456</strong></small>
                     </div>
 
                     <div class="mb-3">

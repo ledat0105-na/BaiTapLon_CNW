@@ -18,6 +18,7 @@ CREATE TABLE users (
     phone        VARCHAR(20),
     role         ENUM('ADMIN', 'CUSTOMER') NOT NULL DEFAULT 'CUSTOMER',
     is_active    TINYINT(1) NOT NULL DEFAULT 1,
+    lock_reason  VARCHAR(500) NULL COMMENT 'Lý do khóa tài khoản',
     created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_username (username),
@@ -194,12 +195,34 @@ INSERT INTO banner_images (image_url, title, subtitle, display_order, is_active)
 CREATE TABLE home_page_settings (
     id                INT PRIMARY KEY DEFAULT 1,
     featured_image_url VARCHAR(500) NULL, -- Ảnh bên trái phần giới thiệu
-    updated_at        DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+    best_seller_product_id BIGINT NULL, -- ID sản phẩm bán chạy
+    best_seller_image_url VARCHAR(500) NULL, -- Ảnh sản phẩm bán chạy
+    best_seller_title VARCHAR(200) NULL, -- Tiêu đề sản phẩm bán chạy
+    best_seller_description VARCHAR(500) NULL, -- Mô tả sản phẩm bán chạy
+    new_arrival_product_id BIGINT NULL, -- ID sản phẩm mới
+    new_arrival_image_url VARCHAR(500) NULL, -- Ảnh sản phẩm mới
+    new_arrival_title VARCHAR(200) NULL, -- Tiêu đề sản phẩm mới
+    new_arrival_description VARCHAR(500) NULL, -- Mô tả sản phẩm mới
+    special_offer_product_id BIGINT NULL, -- ID sản phẩm khuyến mãi
+    special_offer_image_url VARCHAR(500) NULL, -- Ảnh khuyến mãi
+    special_offer_title VARCHAR(200) NULL, -- Tiêu đề khuyến mãi
+    special_offer_description VARCHAR(500) NULL, -- Mô tả khuyến mãi
+    banner_slide_interval INT NOT NULL DEFAULT 5000, -- Thời gian chuyển slide banner (mili giây), 0 = không tự động chuyển
+    updated_at        DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_home_page_settings_best_seller_product
+        FOREIGN KEY (best_seller_product_id) REFERENCES products(id)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_home_page_settings_new_arrival_product
+        FOREIGN KEY (new_arrival_product_id) REFERENCES products(id)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_home_page_settings_special_offer_product
+        FOREIGN KEY (special_offer_product_id) REFERENCES products(id)
+        ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Insert dữ liệu mặc định
-INSERT INTO home_page_settings (id, featured_image_url) VALUES
-(1, '/assets/images/featured.jpg');
+INSERT INTO home_page_settings (id, featured_image_url, best_seller_image_url, best_seller_title, best_seller_description, new_arrival_image_url, new_arrival_title, new_arrival_description, special_offer_image_url, special_offer_title, special_offer_description, banner_slide_interval) VALUES
+(1, '/assets/images/featured.jpg', '/assets/images/deal-01.jpg', 'Mật Ong Hoa Nhãn', 'Mật ong hoa nhãn với hương vị đặc trưng, ngọt thanh tự nhiên. Sản phẩm được thu hoạch từ các vườn nhãn tại Tây Nguyên, đảm bảo chất lượng và độ tinh khiết cao nhất.', '/assets/images/deal-02.jpg', 'Mật Ong Rừng', 'Mật ong rừng nguyên chất từ các khu rừng nguyên sinh, mang hương vị đậm đà và nhiều dưỡng chất quý giá. Sản phẩm được thu hoạch thủ công, đảm bảo chất lượng cao nhất.', '/assets/images/deal-03.jpg', 'Combo Đặc Biệt', 'Combo đặc biệt với nhiều ưu đãi hấp dẫn. Mua ngay để nhận được giá tốt nhất và quà tặng kèm theo.', 5000);
 
 -- 12. BẢNG SẢN PHẨM NỔI BẬT TRANG CHỦ (từ phần "We Provide The Best Property You Like" trở xuống)
 CREATE TABLE featured_products (
@@ -219,17 +242,57 @@ CREATE TABLE featured_products (
     INDEX idx_display_order (display_order),
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
---Bang Gio hang Cho khach hang
-CREATE TABLE `user_cart_items` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `user_id` BIGINT NOT NULL,
-  `product_id` BIGINT NOT NULL,
-  `quantity` INT NOT NULL,
-  `created_at` DATETIME NULL,
-  `updated_at` DATETIME NULL
-);
+
+-- 13. BẢNG GIỎ HÀNG CHO KHÁCH HÀNG
+CREATE TABLE user_cart_items (
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id       BIGINT NOT NULL,
+    product_id    BIGINT NOT NULL,
+    quantity      INT NOT NULL,
+    created_at    DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cart_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_cart_product
+        FOREIGN KEY (product_id) REFERENCES products(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_product_id (product_id)
+) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Thêm cột last_login_at vào bảng users (nếu chưa có)
+-- Lưu ý: Nếu cột đã tồn tại, sẽ báo lỗi. Bỏ qua lỗi nếu cần.
 ALTER TABLE users
 ADD COLUMN last_login_at DATETIME NULL AFTER updated_at;
+
+-- Thêm cột avatar_url vào bảng users (nếu chưa có)
+ALTER TABLE users
+ADD COLUMN avatar_url VARCHAR(255) NULL AFTER last_login_at;
+
+-- Thêm cột rejection_reason vào bảng orders (nếu chưa có)
+ALTER TABLE orders
+ADD COLUMN rejection_reason VARCHAR(500) NULL AFTER updated_at;
+
+-- BẢNG NOTIFICATIONS (Thông báo)
+CREATE TABLE IF NOT EXISTS notifications (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT NULL,  -- NULL = thông báo cho tất cả admin
+    title           VARCHAR(255) NOT NULL,
+    message         VARCHAR(1000) NULL,
+    type            VARCHAR(50) NOT NULL DEFAULT 'INFO', -- INFO, SUCCESS, WARNING, ERROR
+    related_id      BIGINT NULL,  -- ID của đơn hàng hoặc entity liên quan
+    related_type    VARCHAR(50) NULL, -- ORDER, USER, etc.
+    is_read         TINYINT(1) NOT NULL DEFAULT 0,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    read_at         DATETIME NULL,
+    CONSTRAINT fk_notifications_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_is_read (is_read),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- ============================================
 -- INSERT DỮ LIỆU MẪU
@@ -238,6 +301,7 @@ ADD COLUMN last_login_at DATETIME NULL AFTER updated_at;
 -- 1. INSERT USERS (Admin và Customer mẫu)
 INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active, created_at) VALUES
 ('admin', 'admin@honey.com', 'admin123', 'Quản trị viên', '0123456789', 'ADMIN', 1, NOW()),
+('admin2', 'admin2@honey.com', '123', 'Quản trị viên 2', '0123456790', 'ADMIN', 1, NOW()),
 ('customer1', 'customer1@example.com', '123456', 'Nguyễn Văn A', '0987654321', 'CUSTOMER', 1, NOW()),
 ('customer2', 'customer2@example.com', '123456', 'Trần Thị B', '0912345678', 'CUSTOMER', 1, NOW()),
 ('customer3', 'customer3@example.com', '123456', 'Lê Văn C', '0923456789', 'CUSTOMER', 1, NOW());
@@ -315,3 +379,50 @@ INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantit
 (4, 3, 'Mật ong rừng cao cấp 250ml', 180000, 1, 180000),
 (4, 7, 'Mật ong hoa cà phê 1 lít', 400000, 1, 400000),
 (4, 12, 'Sữa ong chúa tươi 10g', 150000, 1, 150000);
+
+-- 8. INSERT BLOG POSTS (Bài viết/Bản tin)
+INSERT INTO blog_posts (author_id, title, slug, thumbnail_url, summary, content, is_published, published_at, created_at) VALUES
+(1, 'Lợi ích sức khỏe của mật ong thiên nhiên', 'loi-ich-suc-khoe-cua-mat-ong-thien-nhien', '/assets/images/blog-01.jpg', 'Mật ong thiên nhiên không chỉ là một loại thực phẩm ngọt ngào mà còn mang lại nhiều lợi ích sức khỏe tuyệt vời.', 'Mật ong thiên nhiên là một trong những thực phẩm quý giá từ thiên nhiên, được ong mật tạo ra từ mật hoa của các loài hoa. Mật ong chứa nhiều vitamin, khoáng chất và chất chống oxy hóa, giúp tăng cường hệ miễn dịch, làm đẹp da, hỗ trợ tiêu hóa và cung cấp năng lượng tự nhiên. Sử dụng mật ong đều đặn mỗi ngày sẽ giúp bạn có một sức khỏe tốt hơn.', 1, NOW(), NOW()),
+
+(1, 'Cách phân biệt mật ong thật và mật ong giả', 'cach-phan-biet-mat-ong-that-va-mat-ong-gia', '/assets/images/blog-02.jpg', 'Hướng dẫn các cách đơn giản để nhận biết mật ong nguyên chất và tránh mua phải mật ong pha trộn.', 'Trên thị trường hiện nay có rất nhiều loại mật ong với chất lượng khác nhau. Để phân biệt mật ong thật và mật ong giả, bạn có thể áp dụng một số cách sau: thử nghiệm với nước (mật ong thật sẽ chìm xuống đáy), kiểm tra độ nhớt, mùi thơm tự nhiên, và quan trọng nhất là mua từ các nhà cung cấp uy tín có chứng nhận chất lượng.', 1, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
+
+(1, 'Công thức làm đẹp với mật ong', 'cong-thuc-lam-dep-voi-mat-ong', '/assets/images/blog-03.jpg', 'Mật ong không chỉ tốt cho sức khỏe mà còn là nguyên liệu làm đẹp tự nhiên hiệu quả.', 'Mật ong từ lâu đã được sử dụng trong các công thức làm đẹp tự nhiên. Mật ong có khả năng dưỡng ẩm, làm sáng da, chống lão hóa và kháng khuẩn. Bạn có thể sử dụng mật ong để làm mặt nạ dưỡng da, tẩy tế bào chết, hoặc dưỡng môi. Các công thức đơn giản với mật ong sẽ giúp bạn có làn da khỏe mạnh và tươi trẻ.', 1, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 7 DAY)),
+
+(1, 'Mật ong và sức khỏe tim mạch', 'mat-ong-va-suc-khoe-tim-mach', '/assets/images/blog-01.jpg', 'Nghiên cứu cho thấy mật ong có thể hỗ trợ sức khỏe tim mạch một cách tự nhiên.', 'Các nghiên cứu khoa học đã chỉ ra rằng mật ong có thể giúp giảm cholesterol xấu, tăng cholesterol tốt, và cải thiện sức khỏe tim mạch. Mật ong chứa các chất chống oxy hóa giúp bảo vệ tim khỏi các tổn thương do gốc tự do. Tuy nhiên, cần sử dụng mật ong một cách hợp lý và kết hợp với chế độ ăn uống lành mạnh.', 1, DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY)),
+
+(1, 'Bảo quản mật ong đúng cách', 'bao-quan-mat-ong-dung-cach', '/assets/images/blog-02.jpg', 'Hướng dẫn cách bảo quản mật ong để giữ được chất lượng và hương vị tốt nhất.', 'Mật ong có thể bảo quản được rất lâu nếu biết cách. Bạn nên bảo quản mật ong ở nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp. Không nên để mật ong trong tủ lạnh vì sẽ làm mật ong bị kết tinh. Sử dụng lọ thủy tinh hoặc nhựa chất lượng tốt, đậy kín nắp sau mỗi lần sử dụng. Với cách bảo quản đúng, mật ong có thể giữ được chất lượng trong nhiều năm.', 1, DATE_SUB(NOW(), INTERVAL 14 DAY), DATE_SUB(NOW(), INTERVAL 14 DAY));
+
+-- 9. INSERT CONTACT MESSAGES (Tin nhắn liên hệ)
+INSERT INTO contact_messages (user_id, name, email, phone, subject, message, status, created_at) VALUES
+(NULL, 'Nguyễn Văn An', 'nguyenvanan@example.com', '0901234567', 'Hỏi về sản phẩm', 'Tôi muốn hỏi về sản phẩm mật ong rừng nguyên chất. Sản phẩm có đảm bảo 100% nguyên chất không?', 'NEW', DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(2, 'Nguyễn Văn A', 'customer1@example.com', '0987654321', 'Đặt hàng số lượng lớn', 'Tôi muốn đặt hàng số lượng lớn mật ong hoa nhãn. Có thể có giá ưu đãi không?', 'IN_PROGRESS', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(NULL, 'Trần Thị Bình', 'tranthibinh@example.com', '0912345678', 'Góp ý về dịch vụ', 'Dịch vụ giao hàng của các bạn rất tốt. Tôi rất hài lòng với sản phẩm mật ong. Cảm ơn!', 'RESOLVED', DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(NULL, 'Lê Văn Cường', 'levancuong@example.com', '0923456789', 'Hỏi về chính sách đổi trả', 'Tôi muốn biết chính sách đổi trả sản phẩm của cửa hàng như thế nào?', 'NEW', DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(3, 'Trần Thị B', 'customer2@example.com', '0912345678', 'Phản hồi tích cực', 'Sản phẩm mật ong của các bạn rất ngon và chất lượng. Tôi sẽ tiếp tục ủng hộ!', 'RESOLVED', DATE_SUB(NOW(), INTERVAL 7 DAY)),
+(NULL, 'Phạm Văn Đức', 'phamvanduc@example.com', '0934567890', 'Yêu cầu tư vấn', 'Tôi muốn được tư vấn về cách sử dụng mật ong để tăng cường sức khỏe. Có thể liên hệ lại cho tôi không?', 'IN_PROGRESS', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(NULL, 'Hoàng Thị Lan', 'hoangthilan@example.com', '0945678901', 'Đề xuất sản phẩm mới', 'Tôi đề xuất các bạn nên có thêm sản phẩm mật ong đóng gói nhỏ hơn để tiện mang theo khi đi du lịch.', 'NEW', NOW()),
+(NULL, 'Vũ Văn Em', 'vuvanem@example.com', '0956789012', 'Hỏi về xuất xứ', 'Mật ong của các bạn được thu hoạch từ đâu? Có chứng nhận chất lượng không?', 'NEW', DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(4, 'Lê Văn C', 'customer3@example.com', '0923456789', 'Cảm ơn', 'Cảm ơn cửa hàng đã cung cấp sản phẩm chất lượng. Tôi rất hài lòng!', 'RESOLVED', DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(NULL, 'Đỗ Thị Phương', 'dothiphuong@example.com', '0967890123', 'Hỏi về giá cả', 'Tôi muốn biết giá của các loại mật ong khác nhau. Có thể gửi bảng giá cho tôi không?', 'IN_PROGRESS', DATE_SUB(NOW(), INTERVAL 2 DAY));
+
+-- 10. INSERT FEATURED PRODUCTS (Sản phẩm nổi bật trang chủ)
+INSERT INTO featured_products (product_id, image_url, title, subtitle, description, display_order, is_active, created_at) VALUES
+(1, '/assets/images/property-01.jpg', 'Mật Ong Rừng Nguyên Chất', 'Mật Ong Rừng', 'Mật ong rừng được thu hoạch từ các tổ ong tự nhiên trong rừng, không qua xử lý, giữ nguyên hương vị đặc trưng và các dưỡng chất quý giá.', 1, 1, NOW()),
+(4, '/assets/images/property-01.jpg', 'Mật Ong Hoa Nhãn Thơm Ngọt', 'Mật Ong Hoa Nhãn', 'Mật ong hoa nhãn có màu vàng nhạt, vị ngọt thanh, mùi thơm đặc trưng của hoa nhãn, rất tốt cho sức khỏe.', 2, 1, NOW()),
+(6, '/assets/images/property-01.jpg', 'Mật Ong Hoa Cà Phê Đậm Đà', 'Mật Ong Hoa Cà Phê', 'Mật ong hoa cà phê có màu vàng đậm, vị ngọt đậm đà, mùi thơm nồng của hoa cà phê, giàu dinh dưỡng.', 3, 1, NOW()),
+(8, '/assets/images/property-01.jpg', 'Mật Ong Hoa Vải Thanh Mát', 'Mật Ong Hoa Vải', 'Mật ong hoa vải có màu vàng trong, vị ngọt thanh mát, mùi thơm nhẹ nhàng của hoa vải, rất dễ uống.', 4, 1, NOW()),
+(11, '/assets/images/property-01.jpg', 'Kẹo Mật Ong Gừng', 'Sản Phẩm Từ Mật Ong', 'Kẹo mật ong gừng được làm từ mật ong nguyên chất và gừng tươi, có tác dụng giữ ấm cơ thể, tốt cho tiêu hóa.', 5, 1, NOW()),
+(12, '/assets/images/property-01.jpg', 'Sữa Ong Chúa Tươi', 'Sản Phẩm Cao Cấp', 'Sữa ong chúa tươi là thực phẩm bổ dưỡng cao cấp, chứa nhiều vitamin và khoáng chất, tốt cho sức khỏe và làm đẹp.', 6, 1, NOW());
+
+-- 11. INSERT USER CART ITEMS (Giỏ hàng của khách hàng)
+INSERT INTO user_cart_items (user_id, product_id, quantity, created_at, updated_at) VALUES
+(2, 1, 2, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(2, 4, 1, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(3, 2, 1, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(3, 5, 2, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(3, 11, 3, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(4, 6, 1, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(4, 8, 1, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(2, 12, 1, NOW(), NOW());
+
+

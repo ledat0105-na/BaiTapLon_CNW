@@ -215,5 +215,61 @@ public class AdminController : Controller
 
         return View();
     }
+
+    // GET: Admin/ChangePassword - Form đổi mật khẩu
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+    // POST: Admin/ChangePassword - Xử lý đổi mật khẩu
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+    {
+        var userId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var userIdLong))
+        {
+            TempData["ErrorMessage"] = "Vui lòng đăng nhập lại.";
+            return RedirectToAction("Login", "Account");
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userIdLong);
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "Không tìm thấy tài khoản.";
+            return RedirectToAction("Login", "Account");
+        }
+
+        // Kiểm tra mật khẩu hiện tại
+        if (string.IsNullOrWhiteSpace(currentPassword) || user.PasswordHash != currentPassword)
+        {
+            ModelState.AddModelError("currentPassword", "Mật khẩu hiện tại không đúng.");
+            return View();
+        }
+
+        // Kiểm tra mật khẩu mới
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+        {
+            ModelState.AddModelError("newPassword", "Mật khẩu mới phải có ít nhất 6 ký tự.");
+            return View();
+        }
+
+        // Kiểm tra xác nhận mật khẩu
+        if (newPassword != confirmPassword)
+        {
+            ModelState.AddModelError("confirmPassword", "Mật khẩu xác nhận không khớp.");
+            return View();
+        }
+
+        // Cập nhật mật khẩu mới
+        user.PasswordHash = newPassword;
+        user.UpdatedAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Admin {user.Email} đã đổi mật khẩu thành công.");
+        TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+        return RedirectToAction("Index");
+    }
 }
 

@@ -3,6 +3,16 @@
     ViewData["Title"] = "Chi tiết khách hàng";
 }
 
+<style>
+    a.order-link {
+        transition: all 0.2s ease;
+    }
+    a.order-link:hover {
+        color: #0056b3 !important;
+        text-decoration: underline !important;
+    }
+</style>
+
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -62,12 +72,38 @@
                                         @foreach (var order in Model.Orders.OrderByDescending(o => o.OrderDate))
                                         {
                                             <tr>
-                                                <td>#@order.OrderId</td>
+                                                <td>
+                                                    <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" asp-route-returnUrl="@Url.Action("Details", "Customer", new { id = Model.Id })" 
+                                                       class="order-link text-decoration-none fw-bold text-primary" 
+                                                       title="Click để xem chi tiết đơn hàng">
+                                                        #@order.OrderId
+                                                    </a>
+                                                </td>
                                                 <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
                                                 <td>@order.TotalAmount.ToString("#,##0") VNĐ</td>
                                                 <td>
-                                                    <span class="badge bg-@(order.Status == "Delivered" ? "success" : order.Status == "Cancelled" ? "danger" : "warning")">
-                                                        @order.Status
+                                                    <span class="badge bg-@(order.Status == "COMPLETED" ? "success" : order.Status == "CANCELED" ? "danger" : order.Status == "PROCESSING" ? "info" : "warning")">
+                                                        @switch (order.Status)
+                                                        {
+                                                            case "PENDING":
+                                                                <text>Chờ xử lý</text>
+                                                                break;
+                                                            case "PROCESSING":
+                                                                <text>Đang xử lý</text>
+                                                                break;
+                                                            case "SHIPPING":
+                                                                <text>Đang giao</text>
+                                                                break;
+                                                            case "COMPLETED":
+                                                                <text>Hoàn thành</text>
+                                                                break;
+                                                            case "CANCELED":
+                                                                <text>Đã hủy</text>
+                                                                break;
+                                                            default:
+                                                                <text>@order.Status</text>
+                                                                break;
+                                                        }
                                                     </span>
                                                 </td>
                                             </tr>

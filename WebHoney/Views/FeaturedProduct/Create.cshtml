@@ -9,16 +9,20 @@
             <h5 class="mb-0">Thêm sản phẩm nổi bật</h5>
         </div>
         <div class="card-body">
-            <form asp-action="Create" method="post" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <form asp-controller="FeaturedProduct" asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
                 <div class="mb-3">
                     <label for="productId" class="form-label">Chọn sản phẩm (tùy chọn)</label>
                     <select name="productId" id="productId" class="form-select">
                         <option value="">-- Không chọn sản phẩm --</option>
-                        @foreach (var product in ViewBag.Products as SelectList)
+                        @if (ViewBag.Products != null)
                         {
-                            <option value="@product.Value">@product.Text</option>
+                            @foreach (var product in ViewBag.Products as SelectList ?? new SelectList(new List<object>()))
+                            {
+                                <option value="@product.Value">@product.Text</option>
+                            }
                         }
                     </select>
                     <small class="form-text text-muted">Nếu chọn sản phẩm, thông tin sản phẩm sẽ được hiển thị tự động</small>
@@ -86,7 +90,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save"></i> Lưu
                     </button>
-                    <a asp-action="Index" class="btn btn-secondary">
+                    <a asp-controller="FeaturedProduct" asp-action="Index" class="btn btn-secondary">
                         <i class="fa fa-times"></i> Hủy
                     </a>
                 </div>

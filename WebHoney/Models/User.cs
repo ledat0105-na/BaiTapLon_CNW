@@ -48,6 +48,10 @@ public class User
     [Column("is_active")]
     public bool IsActive { get; set; } = true;
     
+    [StringLength(500)]
+    [Column("lock_reason")]
+    public string? LockReason { get; set; }
+    
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     
@@ -56,6 +60,10 @@ public class User
 
     [Column("last_login_at")]
     public DateTime? LastLoginAt { get; set; }
+
+    [StringLength(255)]
+    [Column("avatar_url")]
+    public string? AvatarUrl { get; set; }
     
     // Property để tương thích với code hiện tại (không lưu vào DB)
     [NotMapped]

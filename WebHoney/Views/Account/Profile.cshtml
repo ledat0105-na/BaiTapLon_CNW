@@ -1,6 +1,8 @@
 @model WebHoney.Models.AccountProfileViewModel
 @{
     ViewData["Title"] = "Tài khoản của tôi";
+    var defaultAvatar = "/assets/images/default-avatar.png";
+    var avatarUrl = Model?.User?.AvatarUrl ?? defaultAvatar;
 }
 
 <div class="page-heading header-text">
@@ -14,59 +16,402 @@
     </div>
 </div>
 
-<div class="section best-deal">
+<style>
+    .profile-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 40px 0;
+        min-height: 80vh;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .avatar-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        object-fit: cover;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .avatar-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+
+    .avatar-upload-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #ff6b35;
+        color: #ff6b35;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .avatar-upload-btn:hover {
+        background: #ff6b35;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .avatar-upload-btn i {
+        font-size: 18px;
+    }
+
+    .profile-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 15px 0 5px 0;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .profile-email {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+
+    .profile-role {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .profile-body {
+        padding: 40px;
+    }
+
+    .info-section {
+        margin-bottom: 30px;
+    }
+
+    .info-section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-section-title i {
+        color: #ff6b35;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #555;
+        width: 180px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-label i {
+        color: #ff6b35;
+        width: 20px;
+        text-align: center;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        flex: 1;
+    }
+
+    .orders-section {
+        margin-top: 40px;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .orders-table thead {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: white;
+    }
+
+    .orders-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    .orders-table td {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .orders-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .orders-table tbody tr:hover {
+        background: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-shipping {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-delivered {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-orders i {
+        font-size: 64px;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .empty-orders p {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    #avatarInput {
+        display: none;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .loading-spinner i {
+        font-size: 48px;
+        color: #ff6b35;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="profile-container">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Thông tin cá nhân</h5>
+            <div class="col-lg-12">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <img src="@avatarUrl" alt="Ảnh đại diện" class="avatar-image" id="avatarImage" onerror="this.src='@defaultAvatar'">
+                            <label for="avatarInput" class="avatar-upload-btn" title="Cập nhật ảnh đại diện">
+                                <i class="fa fa-camera"></i>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" />
+                        </div>
+                        <div class="profile-name">@(Model?.User?.FullName ?? "Khách hàng")</div>
+                        <div class="profile-email">@(Model?.User?.Email ?? "")</div>
+                        @if (Model?.User?.Role == "ADMIN" || Model?.User?.Role == "Admin")
+                        {
+                            <div class="profile-role">
+                                <i class="fa fa-shield"></i> Quản trị viên
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="profile-role">
+                                <i class="fa fa-user"></i> Khách hàng
+                            </div>
+                        }
                     </div>
-                    <div class="card-body">
-                        <p><strong>Tên đăng nhập:</strong> @Model.User.Username</p>
-                        <p><strong>Họ và tên:</strong> @Model.User.FullName</p>
-                        <p><strong>Email:</strong> @Model.User.Email</p>
-                        <p><strong>Số điện thoại:</strong> @Model.User.Phone</p>
-                        <p><strong>Ngày tạo:</strong> @Model.User.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
-                        <p class="text-muted small mb-0">(Hiện tại trang này chỉ cho phép xem thông tin. Nếu bạn muốn, mình có thể thêm chức năng chỉnh sửa thông tin sau.)</p>
+
+                    <div class="profile-body">
+                        <div class="info-section">
+                            <div class="info-section-title">
+                                <i class="fa fa-info-circle"></i>
+                                Thông tin cá nhân
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fa fa-user"></i>
+                                    Tên đăng nhập:
+                                </div>
+                                <div class="info-value">@(Model?.User?.Username ?? "Chưa có")</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fa fa-id-card"></i>
+                                    Họ và tên:
+                                </div>
+                                <div class="info-value">@(Model?.User?.FullName ?? "")</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fa fa-envelope"></i>
+                                    Email:
+                                </div>
+                                <div class="info-value">@(Model?.User?.Email ?? "")</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fa fa-phone"></i>
+                                    Số điện thoại:
+                                </div>
+                                <div class="info-value">@(Model?.User?.Phone ?? "Chưa có")</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fa fa-calendar"></i>
+                                    Ngày tạo tài khoản:
+                                </div>
+                                <div class="info-value">@(Model?.User?.CreatedAt.ToString("dd/MM/yyyy HH:mm") ?? "")</div>
                     </div>
+                            @if (Model?.User?.LastLoginAt.HasValue == true)
+                            {
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fa fa-sign-in"></i>
+                                        Đăng nhập lần cuối:
+                    </div>
+                                    <div class="info-value">@Model.User.LastLoginAt!.Value.ToString("dd/MM/yyyy HH:mm")</div>
                 </div>
+                            }
             </div>
 
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Lịch sử đơn hàng</h5>
+                        <div class="orders-section">
+                            <div class="info-section-title">
+                                <i class="fa fa-shopping-bag"></i>
+                                Lịch sử đơn hàng
                     </div>
-                    <div class="card-body">
-                        @if (!Model.Orders.Any())
+                            @if (Model?.Orders == null || !Model.Orders.Any())
                         {
+                                <div class="empty-orders">
+                                    <i class="fa fa-shopping-cart"></i>
                             <p>Bạn chưa có đơn hàng nào.</p>
+                                </div>
                         }
                         else
                         {
                             <div class="table-responsive">
-                                <table class="table table-bordered align-middle mb-0">
+                                    <table class="orders-table">
                                     <thead>
                                         <tr>
                                             <th>Mã đơn</th>
                                             <th>Ngày đặt</th>
                                             <th>Trạng thái</th>
                                             <th class="text-end">Tổng tiền</th>
-                                            <th></th>
+                                                <th class="text-center">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var order in Model.Orders)
+                                            @foreach (var order in Model?.Orders ?? new List<WebHoney.Models.Order>())
                                         {
                                             <tr>
-                                                <td>#@order.Id</td>
+                                                    <td><strong>#@order.Id</strong></td>
                                                 <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                                <td>@order.Status</td>
-                                                <td class="text-end">@order.TotalAmount.ToString("#,##0") VNĐ</td>
+                                                    <td>
+                                                        <span class="status-badge status-@order.Status.ToLower()">
+                                                            @order.Status
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end"><strong>@order.TotalAmount.ToString("#,##0") VNĐ</strong></td>
                                                 <td class="text-center">
-                                                    <a asp-controller="Cart" asp-action="MyOrderDetails" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
-                                                        Xem chi tiết
+                                                        <a asp-controller="Cart" asp-action="MyOrderDetails" asp-route-id="@order.Id" class="btn btn-sm btn-primary">
+                                                            <i class="fa fa-eye"></i> Xem chi tiết
                                                     </a>
                                                 </td>
                                             </tr>
@@ -81,3 +426,71 @@
         </div>
     </div>
 </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <i class="fa fa-spinner"></i>
+        <p style="margin-top: 15px; color: #2c3e50;">Đang tải ảnh...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+
+            // Kiểm tra định dạng file
+            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif, webp).');
+                return;
+            }
+
+            // Kiểm tra kích thước file (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước file không được vượt quá 5MB.');
+                return;
+            }
+
+            // Hiển thị loading
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // Tạo FormData
+            var formData = new FormData();
+            formData.append('avatarFile', file);
+            
+            // Lấy token từ meta tag hoặc tạo mới
+            var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (token) {
+                formData.append('__RequestVerificationToken', token);
+            }
+
+            // Upload
+            fetch('@Url.Action("UploadAvatar", "Account")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if (data.success) {
+                    // Cập nhật ảnh
+                    document.getElementById('avatarImage').src = data.avatarUrl + '?t=' + new Date().getTime();
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.');
+            });
+        });
+
+        // Tạo AntiForgeryToken ẩn
+        @Html.AntiForgeryToken()
+    </script>
+}

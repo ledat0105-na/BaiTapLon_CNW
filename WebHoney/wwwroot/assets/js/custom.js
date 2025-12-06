@@ -22,23 +22,10 @@
 	  }
 	})
 
-	$('.owl-banner').owlCarousel({
-	  center: true,
-      items:1,
-      loop:true,
-      nav: true,
-	  dots:true,
-	  navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i>','<i class="fa fa-angle-right" aria-hidden="true"></i>'],
-      margin:30,
-      responsive:{
-        992:{
-            items:1
-        },
-		1200:{
-			items:1
-		}
-      }
-	});
+	// Banner carousel sẽ được khởi tạo trong Home/Index.cshtml với cài đặt từ database
+	// Tắt khởi tạo ở đây để tránh conflict với cài đặt từ admin
+	// Banner carousel được quản lý hoàn toàn bởi script trong Home/Index.cshtml
+	// Không khởi tạo banner carousel ở đây nữa
 
 	var width = $(window).width();
 		$(window).resize(function() {

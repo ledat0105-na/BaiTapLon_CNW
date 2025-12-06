@@ -1,0 +1,59 @@
+@model WebHoney.ViewModels.LockAccountViewModel
+@{
+    ViewData["Title"] = "Khóa tài khoản khách hàng";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-lock"></i> Khóa tài khoản khách hàng</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <strong>Thông tin khách hàng:</strong><br />
+                <strong>Tên:</strong> @Model.CustomerName<br />
+                <strong>Email:</strong> @Model.CustomerEmail
+            </div>
+
+            <form asp-action="LockAccount" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.CustomerId" />
+
+                <div class="mb-3">
+                    <label for="lockReason" class="form-label">
+                        <strong>Lý do khóa tài khoản <span class="text-danger">*</span></strong>
+                    </label>
+                    <textarea 
+                        asp-for="LockReason"
+                        class="form-control" 
+                        rows="5" 
+                        placeholder="Nhập lý do khóa tài khoản của khách hàng này. Lý do này sẽ được hiển thị cho khách hàng khi họ cố gắng đăng nhập."
+                        required></textarea>
+                    <small class="form-text text-muted">
+                        Lý do khóa sẽ được hiển thị cho khách hàng khi họ cố gắng đăng nhập.
+                    </small>
+                    <span asp-validation-for="LockReason" class="text-danger"></span>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Lưu ý:</strong> Sau khi khóa, khách hàng sẽ không thể đăng nhập vào hệ thống cho đến khi admin mở khóa tài khoản.
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-lock"></i> Xác nhận khóa tài khoản
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

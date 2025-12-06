@@ -42,6 +42,10 @@ public class Order
     
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+
+    [Column("rejection_reason")]
+    [StringLength(500)]
+    public string? RejectionReason { get; set; }
     
     // Computed property để tương thích với code hiện tại
     [NotMapped]

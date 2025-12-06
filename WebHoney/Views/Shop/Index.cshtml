@@ -11,6 +11,249 @@
     var totalPages = (int)ViewData["TotalPages"]!;
 }
 
+<style>
+    .shop-page {
+        background: #f8f9fa;
+        padding: 40px 0;
+    }
+    
+    .filter-sidebar {
+        background: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .filter-sidebar h4 {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ff6b35;
+    }
+    
+    .filter-sidebar .form-label {
+        color: #555;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .filter-sidebar .form-control,
+    .filter-sidebar .form-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .filter-sidebar .form-control:focus,
+    .filter-sidebar .form-select:focus {
+        border-color: #ff6b35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    
+    .filter-sidebar .btn-primary {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+    }
+    
+    .filter-sidebar .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+    }
+    
+    .product-card {
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .product-card img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+    
+    .product-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .product-card .category {
+        display: inline-block;
+        color: #ff6b35;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 5px 12px;
+        background: rgba(255,107,53,0.1);
+        border-radius: 20px;
+        margin: 15px 20px 10px;
+    }
+    
+    .product-card h6 {
+        margin: 0 20px 10px;
+    }
+    
+    .product-card h6 a {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 16px;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .product-card h6 a:hover {
+        color: #ff6b35;
+    }
+    
+    .product-card .price {
+        color: #e74c3c;
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 20px 5px;
+        display: block;
+    }
+    
+    .product-card .volume {
+        color: #7f8c8d;
+        font-size: 13px;
+        margin: 0 20px 15px;
+        display: block;
+    }
+    
+    .product-card .main-button {
+        margin-top: auto;
+        padding: 0 20px 20px;
+    }
+    
+    .product-card .main-button a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+    }
+    
+    .product-card .main-button a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+    }
+    
+    .pagination-info {
+        text-align: center;
+        color: #7f8c8d;
+        margin: 30px 0 20px;
+        font-size: 14px;
+    }
+    
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 8px;
+    }
+    
+    .pagination li {
+        margin: 0;
+    }
+    
+    .pagination a,
+    .pagination span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .pagination a {
+        color: #2c3e50;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .pagination a:hover {
+        background: #ff6b35;
+        color: #fff;
+        border-color: #ff6b35;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+    }
+    
+    .pagination .active span {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+    }
+    
+    .pagination .disabled span {
+        color: #ccc;
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        cursor: not-allowed;
+    }
+    
+    .no-products {
+        background: #fff;
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    
+    .no-products h4 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .no-products p {
+        color: #7f8c8d;
+        margin: 0;
+    }
+</style>
+
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -22,25 +265,25 @@
     </div>
 </div>
 
-<div class="section best-deal">
+<div class="shop-page">
     <div class="container">
         <div class="row">
             <!-- Sidebar: Filter -->
             <div class="col-lg-3">
-                <div class="filter-form">
-                    <h4>Bộ lọc</h4>
+                <div class="filter-sidebar">
+                    <h4><i class="fa fa-filter me-2"></i> Bộ lọc</h4>
                     <form method="get" asp-controller="Shop" asp-action="Index">
                         <input type="hidden" name="page" value="1" />
                         
                         <!-- Tìm kiếm -->
                         <div class="mb-3">
-                            <label class="form-label">Tìm kiếm</label>
+                            <label class="form-label"><i class="fa fa-search me-2"></i> Tìm kiếm</label>
                             <input type="text" name="search" class="form-control" value="@search" placeholder="Nhập tên sản phẩm...">
                         </div>
 
                         <!-- Danh mục -->
                         <div class="mb-3">
-                            <label class="form-label">Danh mục</label>
+                            <label class="form-label"><i class="fa fa-list me-2"></i> Danh mục</label>
                             <select name="categoryId" class="form-select" onchange="this.form.submit()">
                                 <option value="">Tất cả danh mục</option>
                                 @foreach (var category in categories)
@@ -52,7 +295,7 @@
 
                         <!-- Sắp xếp -->
                         <div class="mb-3">
-                            <label class="form-label">Sắp xếp</label>
+                            <label class="form-label"><i class="fa fa-sort me-2"></i> Sắp xếp</label>
                             <select name="sortBy" class="form-select" onchange="this.form.submit()">
                                 <option value="">Mới nhất</option>
                                 <option value="price_asc" selected="@(sortBy == "price_asc")">Giá: Tăng dần</option>
@@ -62,7 +305,9 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-search me-2"></i> Tìm kiếm
+                        </button>
                     </form>
                 </div>
             </div>
@@ -75,19 +320,21 @@
                         @foreach (var product in Model)
                         {
                             <div class="col-lg-4 col-md-6 mb-4">
-                                <div class="item">
+                                <div class="product-card">
                                     <a href="@Url.Action("Details", "Shop", new { id = product.Id })">
-                                        <img src="@(product.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@product.Name" style="width: 100%; height: 250px; object-fit: cover;" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
+                                        <img src="@(product.ImageUrl ?? "/assets/images/property-01.jpg")" alt="@product.Name" onerror="this.onerror=null; this.src='/assets/images/property-01.jpg';">
                                     </a>
                                     <span class="category">@product.Category?.Name</span>
                                     <h6><a href="@Url.Action("Details", "Shop", new { id = product.Id })">@product.Name</a></h6>
                                     <span class="price">@product.Price.ToString("#,##0") VNĐ</span>
                                     @if (product.Volume.HasValue)
                                     {
-                                        <span class="volume">@product.Volume @product.Unit</span>
+                                        <span class="volume"><i class="fa fa-flask me-1"></i> @product.Volume @product.Unit</span>
                                     }
                                     <div class="main-button">
-                                        <a href="@Url.Action("Details", "Shop", new { id = product.Id })">Xem chi tiết</a>
+                                        <a href="@Url.Action("Details", "Shop", new { id = product.Id })">
+                                            <i class="fa fa-shopping-cart me-2"></i> Xem chi tiết
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -95,19 +342,69 @@
                     </div>
 
                     <!-- Pagination Info -->
-                    <div class="row mt-4 mb-3">
-                        <div class="col-12 text-center">
-                            <p class="text-muted mb-0">
-                                Hiển thị <strong>@((page - 1) * pageSize + 1)</strong> - <strong>@(Math.Min(page * pageSize, totalItems))</strong> 
-                                trong tổng số <strong>@totalItems</strong> sản phẩm
-                            </p>
-                        </div>
+                    <div class="pagination-info">
+                        Hiển thị <strong>@((page - 1) * pageSize + 1)</strong> - <strong>@(Math.Min(page * pageSize, totalItems))</strong> 
+                        trong tổng số <strong>@totalItems</strong> sản phẩm
                     </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages > 1)
+                    {
+                        <div class="pagination-wrapper">
+                            <ul class="pagination">
+                                @if (page > 1)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Index", "Shop", new { search = search, categoryId = categoryId, sortBy = sortBy, page = page - 1 })" aria-label="Previous">
+                                            <i class="fa fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="disabled">
+                                        <span><i class="fa fa-chevron-left"></i></span>
+                                    </li>
+                                }
+
+                                @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                                {
+                                    if (i == page)
+                                    {
+                                        <li class="active">
+                                            <span>@i</span>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("Index", "Shop", new { search = search, categoryId = categoryId, sortBy = sortBy, page = i })">@i</a>
+                                        </li>
+                                    }
+                                }
+
+                                @if (page < totalPages)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Index", "Shop", new { search = search, categoryId = categoryId, sortBy = sortBy, page = page + 1 })" aria-label="Next">
+                                            <i class="fa fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="disabled">
+                                        <span><i class="fa fa-chevron-right"></i></span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
                 }
                 else
                 {
-                    <div class="alert alert-info">
-                        <h4>Không tìm thấy sản phẩm</h4>
+                    <div class="no-products">
+                        <h4><i class="fa fa-inbox me-2"></i> Không tìm thấy sản phẩm</h4>
                         <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với bộ lọc khác.</p>
                     </div>
                 }

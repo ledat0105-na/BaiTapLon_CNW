@@ -68,7 +68,32 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Địa chỉ giao hàng</label>
-                                <textarea class="form-control" name="Address" rows="3" required></textarea>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label small">Số nhà, tên đường</label>
+                                        <input type="text" id="Street" class="form-control" placeholder="Ví dụ: 123 Đường ABC" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Tỉnh/Thành phố</label>
+                                        <select id="ProvinceCode" class="form-select">
+                                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Quận/Huyện</label>
+                                        <select id="DistrictCode" class="form-select" disabled>
+                                            <option value="">-- Chọn quận/huyện --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Phường/Xã</label>
+                                        <select id="WardCode" class="form-select" disabled>
+                                            <option value="">-- Chọn phường/xã --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="Address" id="Address" required />
+                                <small class="form-text text-muted">Vui lòng chọn đầy đủ thông tin địa chỉ</small>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">
@@ -85,3 +110,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/address-selector.js"></script>
+}

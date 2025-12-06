@@ -20,9 +20,23 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Quản lý khách hàng</h4>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="fa fa-plus"></i> Thêm khách hàng mới
-        </a>
+        <div class="d-flex gap-2">
+            @{
+                var customersWithoutUsers = Model.Count(c => c.UserId == null && !string.IsNullOrEmpty(c.Email));
+            }
+            @if (customersWithoutUsers > 0)
+            {
+                <form asp-action="CreateUsersForCustomers" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Bạn có chắc muốn tạo tài khoản đăng nhập cho @customersWithoutUsers khách hàng chưa có tài khoản? Mật khẩu mặc định sẽ là: 123456');">
+                        <i class="fa fa-user-plus"></i> Tạo tài khoản cho khách hàng (@customersWithoutUsers)
+                    </button>
+                </form>
+            }
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Thêm khách hàng mới
+            </a>
+        </div>
     </div>
 
     <!-- Bộ lọc -->
@@ -108,12 +122,27 @@
                                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form asp-action="ToggleActive" asp-route-id="@item.Id" method="post" style="display: inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn @(item.IsActive ? "btn-secondary" : "btn-success")" title="@(item.IsActive ? "Khóa" : "Mở khóa")">
-                                                <i class="fas @(item.IsActive ? "fa-lock" : "fa-unlock")"></i>
-                                            </button>
-                                        </form>
+                                        @if (item.IsActive && item.User != null)
+                                        {
+                                            <a asp-action="LockAccount" asp-route-id="@item.Id" class="btn btn-secondary" title="Khóa tài khoản">
+                                                <i class="fas fa-lock"></i>
+                                            </a>
+                                        }
+                                        else if (!item.IsActive)
+                                        {
+                                            <form asp-action="UnlockAccount" asp-route-id="@item.Id" method="post" style="display: inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-success" title="Mở khóa tài khoản">
+                                                    <i class="fas fa-unlock"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted" title="Khách hàng này chưa có tài khoản đăng nhập">
+                                                <i class="fas fa-user-slash"></i>
+                                            </span>
+                                        }
                                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa khách hàng này?');">
                                             <i class="fas fa-trash"></i>
                                         </a>

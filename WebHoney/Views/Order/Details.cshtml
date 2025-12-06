@@ -1,15 +1,25 @@
 @model WebHoney.Models.Order
 @{
     ViewData["Title"] = "Chi tiết đơn hàng";
+    var returnUrl = ViewData["ReturnUrl"] as string;
 }
 
 <div class="container-fluid">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Chi tiết đơn hàng #@Model.OrderId</h5>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="fa fa-arrow-left"></i> Quay lại
-            </a>
+            @if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                <a href="@returnUrl" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            }
         </div>
         <div class="card-body">
             <!-- Thông tin đơn hàng -->
@@ -69,26 +79,43 @@
                 </div>
             </div>
 
+            @if (!string.IsNullOrEmpty(Model.RejectionReason))
+            {
+                <div class="alert alert-danger mb-4">
+                    <strong><i class="fa fa-exclamation-triangle"></i> Lý do hủy đơn:</strong>
+                    <p class="mb-0 mt-2">@Model.RejectionReason</p>
+                </div>
+            }
+
             <!-- Cập nhật trạng thái -->
             <div class="row mb-4">
                 <div class="col-md-12">
                     <h6>Cập nhật trạng thái</h6>
-                    <form asp-action="UpdateStatus" method="post" class="row g-3">
+                    <form asp-action="UpdateStatus" method="post" id="updateStatusForm">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.Id" />
-                        <div class="col-md-4">
-                            <select name="status" class="form-select" required>
-                                <option value="PENDING" selected="@(Model.Status == "PENDING")">Chờ xử lý</option>
-                                <option value="PROCESSING" selected="@(Model.Status == "PROCESSING")">Đang xử lý</option>
-                                <option value="SHIPPING" selected="@(Model.Status == "SHIPPING")">Đang giao</option>
-                                <option value="COMPLETED" selected="@(Model.Status == "COMPLETED")">Hoàn thành</option>
-                                <option value="CANCELED" selected="@(Model.Status == "CANCELED")">Đã hủy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-save"></i> Cập nhật trạng thái
-                            </button>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Trạng thái</label>
+                                <select name="status" id="statusSelect" class="form-select" required>
+                                    <option value="PENDING" selected="@(Model.Status == "PENDING")">Chờ xử lý</option>
+                                    <option value="PROCESSING" selected="@(Model.Status == "PROCESSING")">Đang xử lý</option>
+                                    <option value="SHIPPING" selected="@(Model.Status == "SHIPPING")">Đang giao</option>
+                                    <option value="COMPLETED" selected="@(Model.Status == "COMPLETED")">Hoàn thành</option>
+                                    <option value="CANCELED" selected="@(Model.Status == "CANCELED")">Đã hủy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" id="rejectionReasonDiv" style="display: none;">
+                                <label class="form-label">Lý do hủy đơn <span class="text-danger">*</span></label>
+                                <textarea name="rejectionReason" id="rejectionReason" class="form-control" rows="3" placeholder="Nhập lý do hủy đơn hàng (bắt buộc khi hủy)"></textarea>
+                                <small class="form-text text-muted">Lý do này sẽ được gửi đến khách hàng qua thông báo.</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa fa-save"></i> Cập nhật
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -132,4 +159,43 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('statusSelect').addEventListener('change', function() {
+            var rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
+            var rejectionReason = document.getElementById('rejectionReason');
+            
+            if (this.value === 'CANCELED') {
+                rejectionReasonDiv.style.display = 'block';
+                rejectionReason.setAttribute('required', 'required');
+            } else {
+                rejectionReasonDiv.style.display = 'none';
+                rejectionReason.removeAttribute('required');
+                rejectionReason.value = '';
+            }
+        });
+
+        // Kiểm tra nếu status hiện tại là CANCELED thì hiển thị trường lý do
+        document.addEventListener('DOMContentLoaded', function() {
+            var statusSelect = document.getElementById('statusSelect');
+            if (statusSelect.value === 'CANCELED') {
+                document.getElementById('rejectionReasonDiv').style.display = 'block';
+                document.getElementById('rejectionReason').setAttribute('required', 'required');
+            }
+        });
+
+        // Validation trước khi submit
+        document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
+            var status = document.getElementById('statusSelect').value;
+            var rejectionReason = document.getElementById('rejectionReason').value;
+            
+            if (status === 'CANCELED' && !rejectionReason.trim()) {
+                e.preventDefault();
+                alert('Vui lòng nhập lý do hủy đơn hàng.');
+                return false;
+            }
+        });
+    </script>
+}
 

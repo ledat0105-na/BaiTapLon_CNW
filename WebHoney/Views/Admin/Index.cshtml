@@ -13,80 +13,274 @@
     var topProducts = (List<WebHoney.Models.ViewModels.TopProductViewModel>)ViewData["TopProducts"]!;
 }
 
+<style>
+    .dashboard-stats {
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card.primary {
+        border-left-color: #4facfe;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .stat-card.success {
+        border-left-color: #56ab2f;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+    
+    .stat-card.warning {
+        border-left-color: #f093fb;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .stat-card.info {
+        border-left-color: #4facfe;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+    
+    .stat-card.danger {
+        border-left-color: #eb3349;
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+    }
+    
+    .stat-card.secondary {
+        border-left-color: #6c757d;
+        background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        color: white;
+    }
+    
+    .stat-card.dark {
+        border-left-color: #2c3e50;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+    }
+    
+    .stat-card-header {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .stat-card-header i {
+        font-size: 16px;
+    }
+    
+    .stat-card-value {
+        font-size: 36px;
+        font-weight: 700;
+        margin: 10px 0;
+        line-height: 1.2;
+    }
+    
+    .stat-card-label {
+        font-size: 14px;
+        opacity: 0.8;
+        margin: 0;
+    }
+    
+    .stat-card-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 60px;
+        opacity: 0.2;
+    }
+    
+    .dashboard-section {
+        margin-bottom: 30px;
+    }
+    
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .dashboard-card-header {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: white;
+        padding: 20px 25px;
+        border: none;
+    }
+    
+    .dashboard-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .dashboard-card-body {
+        padding: 25px;
+    }
+    
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 14px;
+        color: white;
+    }
+    
+    .rank-badge.rank-1 {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    }
+    
+    .rank-badge.rank-2 {
+        background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+    }
+    
+    .rank-badge.rank-3 {
+        background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+    }
+    
+    .rank-badge.rank-other {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>
+
 <div class="container-fluid">
     <!-- Thống kê tổng quan -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Đơn hoàn thành hôm nay</div>
-                <div class="card-body">
-                    <h2 class="card-title">@ordersToday</h2>
-                    <p class="card-text">đơn hàng</p>
+    <div class="row dashboard-stats">
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card primary">
+                <div class="stat-card-header">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Đơn hoàn thành hôm nay</span>
                 </div>
+                <div class="stat-card-value">@ordersToday</div>
+                <div class="stat-card-label">đơn hàng</div>
+                <i class="fa fa-shopping-bag stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Doanh thu hôm nay (đơn hoàn thành)</div>
-                <div class="card-body">
-                    <h2 class="card-title">@revenueToday.ToString("N0")</h2>
-                    <p class="card-text">VNĐ</p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card success">
+                <div class="stat-card-header">
+                    <i class="fa fa-money-bill-wave"></i>
+                    <span>Doanh thu hôm nay</span>
                 </div>
+                <div class="stat-card-value">@revenueToday.ToString("N0")</div>
+                <div class="stat-card-label">VNĐ</div>
+                <i class="fa fa-chart-line stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Đơn hàng đang xử lý</div>
-                <div class="card-body">
-                    <h2 class="card-title">@pendingOrders</h2>
-                    <p class="card-text">đơn hàng</p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card warning">
+                <div class="stat-card-header">
+                    <i class="fa fa-clock"></i>
+                    <span>Đơn đang xử lý</span>
                 </div>
+                <div class="stat-card-value">@pendingOrders</div>
+                <div class="stat-card-label">đơn hàng</div>
+                <i class="fa fa-hourglass-half stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Đơn đang giao (SHIPPING)</div>
-                <div class="card-body">
-                    <h2 class="card-title">@shippingOrders</h2>
-                    <p class="card-text">đơn hàng</p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card info">
+                <div class="stat-card-header">
+                    <i class="fa fa-truck"></i>
+                    <span>Đơn đang giao</span>
                 </div>
+                <div class="stat-card-value">@shippingOrders</div>
+                <div class="stat-card-label">đơn hàng</div>
+                <i class="fa fa-shipping-fast stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger mb-3">
-                <div class="card-header">Đơn đã hủy</div>
-                <div class="card-body">
-                    <h2 class="card-title">@canceledOrders</h2>
-                    <p class="card-text">đơn hàng</p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card danger">
+                <div class="stat-card-header">
+                    <i class="fa fa-times-circle"></i>
+                    <span>Đơn đã hủy</span>
                 </div>
+                <div class="stat-card-value">@canceledOrders</div>
+                <div class="stat-card-label">đơn hàng</div>
+                <i class="fa fa-ban stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Doanh thu tháng này</div>
-                <div class="card-body">
-                    <h2 class="card-title">@revenueThisMonth.ToString("N0")</h2>
-                    <p class="card-text">VNĐ</p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card success">
+                <div class="stat-card-header">
+                    <i class="fa fa-calendar-alt"></i>
+                    <span>Doanh thu tháng này</span>
                 </div>
+                <div class="stat-card-value">@revenueThisMonth.ToString("N0")</div>
+                <div class="stat-card-label">VNĐ</div>
+                <i class="fa fa-chart-bar stat-card-icon"></i>
             </div>
         </div>
     </div>
 
     <!-- Top sản phẩm bán chạy -->
-    <div class="row mb-4">
+    <div class="row dashboard-section">
         <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Top sản phẩm bán chạy (theo số lượng trong đơn COMPLETED)</h5>
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h5>
+                        <i class="fa fa-trophy"></i>
+                        Top sản phẩm bán chạy
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="dashboard-card-body">
                     @if (topProducts.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th style="width: 60px;">#</th>
                                         <th>Mã SP</th>
                                         <th>Tên sản phẩm</th>
                                         <th class="text-end">Số lượng đã bán</th>
@@ -98,11 +292,21 @@
                                     @foreach (var p in topProducts)
                                     {
                                         <tr>
-                                            <td>@rank</td>
-                                            <td>@p.ProductId</td>
+                                            <td>
+                                                <span class="rank-badge @(rank == 1 ? "rank-1" : rank == 2 ? "rank-2" : rank == 3 ? "rank-3" : "rank-other")">
+                                                    @rank
+                                                </span>
+                                            </td>
+                                            <td><strong>#@p.ProductId</strong></td>
                                             <td>@p.ProductName</td>
-                                            <td class="text-end">@p.TotalQuantity</td>
-                                            <td class="text-end">@p.TotalRevenue.ToString("#,##0") VNĐ</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-info" style="font-size: 13px; padding: 6px 12px;">
+                                                    <i class="fa fa-box me-1"></i> @p.TotalQuantity
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong style="color: #56ab2f;">@p.TotalRevenue.ToString("#,##0") VNĐ</strong>
+                                            </td>
                                         </tr>
                                         rank++;
                                     }
@@ -112,7 +316,10 @@
                     }
                     else
                     {
-                        <p class="text-muted">Chưa có dữ liệu bán hàng.</p>
+                        <div class="text-center py-5">
+                            <i class="fa fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+                            <p class="text-muted mb-0">Chưa có dữ liệu bán hàng.</p>
+                        </div>
                     }
                 </div>
             </div>
@@ -120,75 +327,92 @@
     </div>
 
     <!-- Thống kê tổng số -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-secondary mb-3">
-                <div class="card-header">Tổng số đơn hàng</div>
-                <div class="card-body">
-                    <h2 class="card-title">@totalOrders</h2>
-                    <p class="card-text">đơn hàng</p>
+    <div class="row dashboard-stats">
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="stat-card secondary">
+                <div class="stat-card-header">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span>Tổng số đơn hàng</span>
                 </div>
+                <div class="stat-card-value">@totalOrders</div>
+                <div class="stat-card-label">đơn hàng</div>
+                <i class="fa fa-clipboard-list stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-dark mb-3">
-                <div class="card-header">Tổng khách hàng</div>
-                <div class="card-body">
-                    <h2 class="card-title">@totalCustomers</h2>
-                    <p class="card-text">khách hàng</p>
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="stat-card dark">
+                <div class="stat-card-header">
+                    <i class="fa fa-users"></i>
+                    <span>Tổng khách hàng</span>
                 </div>
+                <div class="stat-card-value">@totalCustomers</div>
+                <div class="stat-card-label">khách hàng</div>
+                <i class="fa fa-user-friends stat-card-icon"></i>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Tổng sản phẩm đang bán</div>
-                <div class="card-body">
-                    <h2 class="card-title">@totalProducts</h2>
-                    <p class="card-text">sản phẩm</p>
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="stat-card primary">
+                <div class="stat-card-header">
+                    <i class="fa fa-box"></i>
+                    <span>Tổng sản phẩm</span>
                 </div>
+                <div class="stat-card-value">@totalProducts</div>
+                <div class="stat-card-label">sản phẩm</div>
+                <i class="fa fa-archive stat-card-icon"></i>
             </div>
         </div>
     </div>
 
     <!-- Sản phẩm sắp hết -->
-    <div class="row mb-4">
+    <div class="row dashboard-section">
         <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Sản phẩm sắp hết hàng (≤ 10 sản phẩm)</h5>
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h5>
+                        <i class="fa fa-exclamation-triangle"></i>
+                        Sản phẩm sắp hết hàng (≤ 10 sản phẩm)
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="dashboard-card-body">
                     @if (lowStockProducts.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th>Mã SP</th>
                                         <th>Tên sản phẩm</th>
                                         <th>Danh mục</th>
-                                        <th>Tồn kho</th>
-                                        <th>Giá</th>
-                                        <th>Trạng thái</th>
+                                        <th class="text-center">Tồn kho</th>
+                                        <th class="text-end">Giá</th>
+                                        <th class="text-center">Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var product in lowStockProducts)
                                     {
-                                        <tr class="@(product.Stock <= 5 ? "table-danger" : "table-warning")">
-                                            <td>@product.ProductId</td>
+                                        <tr style="background: @(product.Stock <= 5 ? "rgba(235, 52, 73, 0.05)" : "rgba(240, 147, 251, 0.05)");">
+                                            <td><strong>#@product.ProductId</strong></td>
                                             <td>@product.ProductName</td>
-                                            <td>@(product.Category?.CategoryName ?? "N/A")</td>
-                                            <td><strong>@product.Stock</strong></td>
-                                            <td>@product.Price.ToString("#,##0") VNĐ</td>
                                             <td>
+                                                <span class="badge bg-secondary">@(product.Category?.CategoryName ?? "N/A")</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong style="font-size: 18px; color: @(product.Stock <= 5 ? "#eb3349" : "#f093fb");">@product.Stock</strong>
+                                            </td>
+                                            <td class="text-end">@product.Price.ToString("#,##0") VNĐ</td>
+                                            <td class="text-center">
                                                 @if (product.Stock <= 5)
                                                 {
-                                                    <span class="badge bg-danger">Sắp hết</span>
+                                                    <span class="badge" style="background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); padding: 8px 15px; font-size: 12px;">
+                                                        <i class="fa fa-exclamation-circle me-1"></i> Sắp hết
+                                                    </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-warning">Còn ít</span>
+                                                    <span class="badge" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 8px 15px; font-size: 12px;">
+                                                        <i class="fa fa-exclamation me-1"></i> Còn ít
+                                                    </span>
                                                 }
                                             </td>
                                         </tr>
@@ -199,7 +423,10 @@
                     }
                     else
                     {
-                        <p class="text-muted">Không có sản phẩm nào sắp hết hàng.</p>
+                        <div class="text-center py-5">
+                            <i class="fa fa-check-circle" style="font-size: 48px; color: #56ab2f; margin-bottom: 15px;"></i>
+                            <p class="text-muted mb-0">Không có sản phẩm nào sắp hết hàng.</p>
+                        </div>
                     }
                 </div>
             </div>

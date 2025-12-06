@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CongNgheWed\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj": {}
+    "D:\\DU LIEU\\CONG NGHE WEB\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj": {}
   },
   "projects": {
-    "D:\\CongNgheWed\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj": {
+    "D:\\DU LIEU\\CONG NGHE WEB\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CongNgheWed\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj",
+        "projectUniqueName": "D:\\DU LIEU\\CONG NGHE WEB\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj",
         "projectName": "WebHoney",
-        "projectPath": "D:\\CongNgheWed\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj",
-        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "D:\\CongNgheWed\\BaiTapLon_CNW\\WebHoney\\obj\\",
+        "projectPath": "D:\\DU LIEU\\CONG NGHE WEB\\BaiTapLon_CNW\\WebHoney\\WebHoney.csproj",
+        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
+        "outputPath": "D:\\DU LIEU\\CONG NGHE WEB\\BaiTapLon_CNW\\WebHoney\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
